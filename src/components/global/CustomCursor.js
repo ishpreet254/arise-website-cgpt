@@ -15,10 +15,10 @@ export default function CustomCursor() {
     if (!finePointer.matches || reducedMotion.matches) return;
 
     let rafId = 0;
-    let x = window.innerWidth / 2;
-    let y = window.innerHeight / 2;
-    let targetX = x;
-    let targetY = y;
+    let x = -100;
+    let y = -100;
+    let targetX = -100;
+    let targetY = -100;
 
     const move = (event) => {
       targetX = event.clientX;
@@ -26,15 +26,18 @@ export default function CustomCursor() {
     };
 
     const render = () => {
-      x += (targetX - x) * 0.18;
-      y += (targetY - y) * 0.18;
-      cursor.style.setProperty("--cursor-x", `${x}px`);
-      cursor.style.setProperty("--cursor-y", `${y}px`);
+      // 0.22 factor offers a silky smooth trail with zero noticeable latency
+      x += (targetX - x) * 0.22;
+      y += (targetY - y) * 0.22;
+
+      // Direct hardware-accelerated transformation
+      cursor.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+
       rafId = requestAnimationFrame(render);
     };
 
     const interactiveSelector =
-      "a, button, [role='button'], input, textarea, select, [data-cursor='interactive']";
+      "a, button, [role='button'], input, textarea, select, [data-cursor='interactive'], .menu-trigger, .nav-panel__close";
 
     const setHover = (event) => {
       const target = event.target.closest?.(interactiveSelector);
@@ -42,8 +45,9 @@ export default function CustomCursor() {
     };
 
     window.addEventListener("pointermove", move, { passive: true });
-    document.addEventListener("pointerover", setHover);
-    document.addEventListener("pointerout", setHover);
+    document.addEventListener("pointerover", setHover, { passive: true });
+    document.addEventListener("pointerout", setHover, { passive: true });
+
     rafId = requestAnimationFrame(render);
 
     return () => {
