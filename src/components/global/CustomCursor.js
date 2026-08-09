@@ -3,11 +3,19 @@
 import { useEffect, useRef, useState } from "react";
 
 export default function CustomCursor() {
+  const [mounted, setMounted] = useState(false);
   const dotRef = useRef(null);
   const ringRef = useRef(null);
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
 
+  // Pass 1: Ensure initial hydration match between Server & Client
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Pass 2: Initialize physics and event listeners only after mounting on the client
+  useEffect(() => {
+    if (!mounted) return;
+
     // Hardware & Pointer Detection
     const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
     const noFinePointer = !window.matchMedia("(pointer: fine)").matches;
@@ -15,9 +23,8 @@ export default function CustomCursor() {
     const hasTouchSupport =
       "ontouchstart" in window || navigator.maxTouchPoints > 0;
 
-    // Automatically turn off cursor on mobile / touch devices
+    // Turn off tracking on mobile/touch screens
     if (coarsePointer || noFinePointer || reducedMotion || hasTouchSupport) {
-      setIsTouchDevice(true);
       return;
     }
 
@@ -30,11 +37,11 @@ export default function CustomCursor() {
     let targetX = -100;
     let targetY = -100;
 
-    // Dot coordinates (Fast precision tracking)
+    // Dot coordinates (Fast tracking)
     let dotX = -100;
     let dotY = -100;
 
-    // Ring coordinates (Silky trailing lag)
+    // Ring coordinates (Smooth trailing lag)
     let ringX = -100;
     let ringY = -100;
 
@@ -44,7 +51,6 @@ export default function CustomCursor() {
     };
 
     const render = () => {
-      // Direct interpolation for dual physics
       dotX += (targetX - dotX) * 0.99;
       dotY += (targetY - dotY) * 0.99;
 
@@ -58,7 +64,6 @@ export default function CustomCursor() {
     };
 
     const interactiveSelector =
-      "a, button, [role='button'], input, textarea, select, [data-cursor='interactive'], .menu-trigger, .nav-panel__close";
       "a, button, [role='button'], input, textarea, select, [data-cursor='interactive'], .menu-trigger, .nav-panel__close";
 
     const setHover = (event) => {
@@ -76,9 +81,6 @@ export default function CustomCursor() {
     document.addEventListener("pointerover", setHover, { passive: true });
     document.addEventListener("pointerout", setHover, { passive: true });
 
-    document.addEventListener("pointerover", setHover, { passive: true });
-    document.addEventListener("pointerout", setHover, { passive: true });
-
     rafId = requestAnimationFrame(render);
 
     return () => {
@@ -87,10 +89,10 @@ export default function CustomCursor() {
       document.removeEventListener("pointerout", setHover);
       cancelAnimationFrame(rafId);
     };
-  }, []);
+  }, [mounted]);
 
-  // Do not render anything on touch/mobile screens
-  if (isTouchDevice) return null;
+  // Render nothing on SSR and during initial hydration pass
+  if (!mounted) return null;
 
   return (
     <>
