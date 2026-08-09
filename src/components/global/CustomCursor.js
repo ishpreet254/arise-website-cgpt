@@ -48,8 +48,8 @@ export default function CustomCursor() {
       dotX += (targetX - dotX) * 0.99;
       dotY += (targetY - dotY) * 0.99;
 
-      ringX += (targetX - ringX) * 0.50;
-      ringY += (targetY - ringY) * 0.50;
+      ringX += (targetX - ringX) * 0.40;
+      ringY += (targetY - ringY) * 0.40;
 
       dot.style.transform = `translate3d(${dotX}px, ${dotY}px, 0)`;
       ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0)`;
