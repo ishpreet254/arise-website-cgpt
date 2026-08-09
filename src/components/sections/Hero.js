@@ -109,8 +109,8 @@ export default function Hero() {
         </h1>
 
         <p className="hero__copy">
-          We shape ambitious ideas through strategy, design and technology —
-          building brands and digital experiences made to move forward.
+          We craft bold vision through design and technology.
+          Designed for brands with the ambition to lead.
         </p>
 
         <div className="hero__actions">
@@ -126,7 +126,7 @@ export default function Hero() {
         <div className="hero__meta" aria-label="ARISE capabilities">
           <span>Branding</span>
           <i aria-hidden="true" />
-          <span>Digital</span>
+          <span>Design</span>
           <i aria-hidden="true" />
           <span>Technology</span>
           <i aria-hidden="true" />

@@ -714,7 +714,7 @@ button {
 }
 
 .hero__copy {
-  max-width: 34rem;
+  max-width: 25rem;
   margin-top: 2rem;
   color: var(--text-secondary);
   font-size: var(--text-body-l);
