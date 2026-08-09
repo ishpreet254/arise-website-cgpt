@@ -1,0 +1,86 @@
+/* ARISE Design Tokens — Master Spec Section 2
+   These are the spec's proposed starting values (a designer's first pass).
+   If exact brand hex codes exist in ARISE's brand guidelines, they should
+   override the color values below — see Master Spec Section 8, item 3. */
+
+:root {
+  /* ---- Color: Dark theme (primary/default) ---- */
+  --bg: #0a0908;
+  --surface: #151310;
+  --surface-raised: #1c1914;
+  --gold: #c9a24b;
+  --gold-champagne: #e8d9b5;
+  --text-primary: #f5f1e8;
+  --text-secondary: #a8a296;
+  --hairline: rgba(255, 255, 255, 0.08);
+  --glass-tint: rgba(21, 19, 16, 0.55);
+  --glass-border: rgba(232, 217, 181, 0.12);
+  --glass-inner-highlight: inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  --shadow-soft: 0 20px 60px rgba(0, 0, 0, 0.25);
+  --nav-bg: rgba(15, 13, 11, 0.72);
+  --nav-border: rgba(232, 217, 181, 0.16);
+  --nav-shadow: 0 18px 55px rgba(0, 0, 0, 0.28);
+  --nav-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  --nav-muted: #9e978b;
+  --menu-bg: rgba(10, 9, 8, 0.55);
+  --menu-border: rgba(232, 217, 181, 0.15);
+  --backdrop: rgba(3, 3, 2, 0.38);
+  --panel-bg: rgba(18, 16, 13, 0.92);
+  --panel-shadow: 0 35px 100px rgba(0, 0, 0, 0.45);
+  --menu-aura: rgba(201, 162, 75, 0.08);
+  --theme-bg: rgba(255, 255, 255, 0.035);
+  --theme-active: rgba(201, 162, 75, 0.14);
+  --theme-active-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+
+  /* ---- Typography ---- */
+  /* Display: Fraunces (Google Fonts, variable, free & clear).
+     Body: General Sans (Fontshare) — double-check current commercial
+     license terms before shipping to production, per Master Spec 8.4. */
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  --font-body: "General Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --text-display-xl: clamp(2.75rem, 6vw, 5.5rem);
+  --text-display-l: clamp(2rem, 4vw, 3.5rem);
+  --text-body-l: clamp(1.05rem, 1.2vw, 1.25rem);
+  --text-body-m: 1rem;
+  --text-caption: 0.75rem;
+  --tracking-caption: 0.18em;
+
+  /* ---- Spacing / Radius ---- */
+  --section-padding-y: clamp(6rem, 10vw, 10rem);
+  --radius-card: 1.75rem;
+  --radius-button: 999px;
+  --radius-field: 0.75rem;
+
+  /* ---- Motion ---- */
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+[data-theme="light"] {
+  --bg: #faf8f3;
+  --surface: #ffffff;
+  --surface-raised: #f2eee3;
+  --gold: #a67c2e;
+  --gold-champagne: #d8c9a3;
+  --text-primary: #17140f;
+  --text-secondary: #6b6459;
+  --hairline: rgba(0, 0, 0, 0.08);
+  --glass-tint: rgba(255, 255, 255, 0.55);
+  --glass-border: rgba(23, 20, 15, 0.08);
+  --glass-inner-highlight: inset 0 1px 1px rgba(255, 255, 255, 0.6);
+  --shadow-soft: 0 20px 60px rgba(23, 20, 15, 0.12);
+  --nav-bg: rgba(246, 242, 233, 0.92);
+  --nav-border: rgba(23, 20, 15, 0.10);
+  --nav-shadow: 0 18px 55px rgba(23, 20, 15, 0.10);
+  --nav-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.78);
+  --nav-muted: #70695e;
+  --menu-bg: rgba(250, 248, 243, 0.72);
+  --menu-border: rgba(23, 20, 15, 0.10);
+  --backdrop: rgba(239, 235, 225, 0.46);
+  --panel-bg: rgba(255, 255, 255, 0.92);
+  --panel-shadow: 0 35px 100px rgba(23, 20, 15, 0.14);
+  --menu-aura: rgba(166, 124, 46, 0.07);
+  --theme-bg: rgba(23, 20, 15, 0.045);
+  --theme-active: rgba(216, 201, 163, 0.32);
+  --theme-active-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+}
