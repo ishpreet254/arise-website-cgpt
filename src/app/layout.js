@@ -1,9 +1,15 @@
+import CustomCursor from "@/components/global/CustomCursor";
 import "./globals.css";
 
 export const metadata = {
   title: "ARISE — Rise Beyond Imagination",
   description:
     "ARISE is a full-service creative & technology agency — branding, web & software development, AI & automation, business analytics, digital marketing, e-commerce, and support.",
+  icons: {
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
+  },
 };
 
 export default function RootLayout({ children }) {
@@ -29,7 +35,10 @@ export default function RootLayout({ children }) {
           href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <CustomCursor />
+        {children}
+      </body>
     </html>
   );
 }
