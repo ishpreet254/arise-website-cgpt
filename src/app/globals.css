@@ -819,6 +819,10 @@ button {
 }
 
 @media (max-width: 900px) {
+  .site-nav__links {
+    display: none;
+  }
+
   .hero__content {
     padding-top: 9rem;
   }

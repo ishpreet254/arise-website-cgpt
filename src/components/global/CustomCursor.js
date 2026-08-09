@@ -9,6 +9,7 @@ export default function CustomCursor() {
 
   // Pass 1: Ensure initial hydration match between Server & Client
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
