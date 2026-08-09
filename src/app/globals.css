@@ -463,51 +463,86 @@ button {
   border-top: 1px solid var(--hairline);
 }
 
-/* ---------- Custom cursor ---------- */
+/* ---------- Custom Cursor (Aesthetic & Minimal) ---------- */
 
-.custom-cursor {
+.cursor-dot {
+  position: fixed;
+  z-index: 10000;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  margin-top: -5px;
+  margin-left: -5px;
+  background-color: var(--gold);
+  border-radius: 50%;
+  pointer-events: none;
+  will-change: transform;
+  transition: opacity 0.3s var(--ease-spring), transform 0.3s var(--ease-spring);
+}
+
+.cursor-ring {
   position: fixed;
   z-index: 9999;
   top: 0;
   left: 0;
-  width: 0.9rem;
-  height: 0.9rem;
-  margin-top: -0.45rem;
-  margin-left: -0.45rem;
-  border: 1px solid var(--gold);
+  width: 32px;
+  height: 32px;
+  margin-top: -16px;
+  margin-left: -16px;
+  border: 1px solid color-mix(in srgb, var(--gold) 45%, transparent);
   border-radius: 50%;
   pointer-events: none;
-  mix-blend-mode: normal;
   will-change: transform;
-  /* CRITICAL: Do NOT add 'transform' to transition here */
+  box-shadow: 0 0 12px color-mix(in srgb, var(--gold) 12%, transparent);
   transition:
-    border-color 0.3s var(--ease-spring),
-    background-color 0.3s var(--ease-spring);
-}
-
-.custom-cursor span {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: var(--gold);
-  transition:
-    transform 0.35s var(--ease-spring),
+    width 0.35s var(--ease-spring),
+    height 0.35s var(--ease-spring),
+    margin 0.35s var(--ease-spring),
+    border-color 0.35s var(--ease-spring),
     background-color 0.35s var(--ease-spring),
-    opacity 0.35s var(--ease-spring);
+    box-shadow 0.35s var(--ease-spring),
+    backdrop-filter 0.35s var(--ease-spring);
 }
 
-.custom-cursor.is-hovering span {
-  transform: scale(2.35);
-  background: color-mix(in srgb, var(--gold) 20%, transparent);
+/* Hover effect: Ring expands into a glass champagne bubble; dot fades out */
+.cursor-ring.is-hovering {
+  width: 52px;
+  height: 52px;
+  margin-top: -26px;
+  margin-left: -26px;
+  border-color: var(--gold-champagne);
+  background-color: color-mix(in srgb, var(--gold) 12%, transparent);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  box-shadow: 0 0 22px color-mix(in srgb, var(--gold) 22%, transparent);
+}
+
+.cursor-dot.is-hovering {
+  opacity: 0;
+  transform: scale(0);
+}
+
+/* Strict Mobile & Accessibility Override */
+@media (pointer: coarse), (hover: none) {
+  .cursor-dot,
+  .cursor-ring {
+    display: none !important;
+  }
+  
+  body {
+    cursor: auto !important;
+  }
+
+  a, button, [role="button"] {
+    cursor: pointer !important;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-
-  .custom-cursor {
-    display: none;
+  .cursor-dot,
+  .cursor-ring {
+    display: none !important;
   }
 }
 
