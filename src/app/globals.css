@@ -889,6 +889,18 @@ button {
 }
 
 /* ============ Services ============ */
+/* Panels are full-bleed dark photography — the overlay stays fixed
+   regardless of site theme so it never fights the images (no cream/white
+   wash in light mode, text stays legible on dark imagery either way). */
+:root {
+  --services-scrim-start: rgba(5, 6, 8, 0.92);
+  --services-scrim-mid: rgba(5, 6, 8, 0.68);
+  --services-text-primary: #f5f1e8;
+  --services-text-secondary: #cfc9bc;
+  --services-eyebrow: #e8d9b5;
+  --services-gold: #c9a24b;
+  --services-hairline: rgba(255, 255, 255, 0.22);
+}
 
 .services {
   position: relative;
@@ -944,7 +956,7 @@ button {
   z-index: 3;
   pointer-events: none;
   background:
-    linear-gradient(0deg, var(--hero-scrim-start) 0%, var(--hero-scrim-mid) 28%, transparent 62%),
+    linear-gradient(0deg, var(--services-scrim-start) 0%, var(--services-scrim-mid) 28%, transparent 62%),
     linear-gradient(90deg, rgba(5, 6, 8, 0.35) 0%, transparent 45%);
 }
 
@@ -962,7 +974,7 @@ button {
   font-weight: 650;
   letter-spacing: var(--tracking-caption);
   text-transform: uppercase;
-  color: var(--gold-champagne);
+  color: var(--services-eyebrow);
 }
 
 .services__name {
@@ -971,7 +983,7 @@ button {
   font-weight: 500;
   font-size: clamp(2.25rem, 4.2vw, 3.75rem);
   line-height: 1.05;
-  color: var(--text-primary);
+  color: var(--services-text-primary);
 }
 
 .services__desc {
@@ -979,7 +991,7 @@ button {
   max-width: 30rem;
   font-size: var(--text-body-l);
   line-height: 1.6;
-  color: var(--text-secondary);
+  color: var(--services-text-secondary);
 }
 
 .services__progress {
@@ -995,12 +1007,12 @@ button {
 .services__tick {
   width: 1.6rem;
   height: 2px;
-  background: var(--hairline);
+  background: var(--services-hairline);
   transition: background 0.4s var(--ease-spring);
 }
 
 .services__tick.is-active {
-  background: var(--gold);
+  background: var(--services-gold);
 }
 
 .services__badge {
@@ -1064,7 +1076,7 @@ button {
 .services__static-scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(0deg, var(--hero-scrim-start) 0%, var(--hero-scrim-mid) 30%, transparent 65%);
+  background: linear-gradient(0deg, var(--services-scrim-start) 0%, var(--services-scrim-mid) 30%, transparent 65%);
 }
 
 .services__static-content {
@@ -1079,7 +1091,7 @@ button {
   font-size: var(--text-caption);
   font-weight: 650;
   letter-spacing: var(--tracking-caption);
-  color: var(--gold);
+  color: var(--services-gold);
 }
 
 @media (max-width: 700px) {
@@ -1130,7 +1142,7 @@ button {
   border: 1px solid rgba(255,255,255,.28);
   background: rgba(255,255,255,.12);
   backdrop-filter: blur(14px);
-  color: var(--text-primary);
+  color: var(--services-text-primary);
   padding: .45rem .8rem;
   border-radius: 999px;
   font-family: var(--font-body);
