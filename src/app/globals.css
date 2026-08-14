@@ -888,6 +888,265 @@ button {
   }
 }
 
+/* ============ About ============ */
+/* Sticky-note stack on a fabric board. Board texture swaps per theme;
+   note paper stays a consistent warm off-white in both themes (real
+   paper doesn't invert), with a shared grain overlay for realism. */
+:root {
+  --about-note-bg: #f7f1e2;
+  --about-note-bg-alt: #f2ead6;
+  --about-note-text: #241f18;
+  --about-note-text-secondary: #55503f;
+  --about-note-shadow-ambient: 0 30px 60px rgba(0, 0, 0, 0.35);
+  --about-note-shadow-contact: 0 6px 10px rgba(0, 0, 0, 0.28);
+  --about-board-image: url("/about/board-dark.webp");
+  --about-board-scrim: rgba(6, 5, 4, 0.35);
+}
+
+[data-theme="light"] {
+  --about-note-shadow-ambient: 0 26px 50px rgba(60, 45, 20, 0.18);
+  --about-note-shadow-contact: 0 5px 8px rgba(60, 45, 20, 0.14);
+  --about-board-image: url("/about/board-light.webp");
+  --about-board-scrim: rgba(255, 252, 244, 0.25);
+}
+
+.about {
+  position: relative;
+  padding: var(--section-padding-y) 0 0;
+  background: var(--bg);
+  overflow: clip;
+}
+
+.about__intro {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 0 clamp(1.5rem, 5vw, 4rem) clamp(3rem, 6vw, 5rem);
+  text-align: center;
+}
+
+.about__eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--text-caption);
+  letter-spacing: var(--tracking-caption);
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0 0 1rem;
+}
+
+.about__heading {
+  font-family: var(--font-display);
+  font-size: var(--text-display-l);
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+  line-height: 1.1;
+}
+
+.about__lede {
+  font-family: var(--font-body);
+  font-size: var(--text-body-l);
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.about__stage {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.about__board {
+  position: absolute;
+  inset: 0;
+  background-image: var(--about-board-image);
+  background-size: cover;
+  background-position: center;
+}
+
+.about__board::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--about-board-scrim);
+}
+
+.about__stack {
+  position: relative;
+  width: min(26rem, 78vw);
+  height: min(26rem, 62vh);
+}
+
+.about__note {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.85rem;
+  padding: clamp(2rem, 4vw, 3rem);
+  background: var(--about-note-bg);
+  border-radius: 6px;
+  box-shadow: var(--about-note-shadow-ambient), var(--about-note-shadow-contact);
+  will-change: transform, opacity;
+}
+
+.about__note:nth-child(odd) {
+  background: var(--about-note-bg-alt);
+}
+
+.about__note::before {
+  /* Paper grain overlay, shared across all notes and both themes. */
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-image: url("/about/paper-texture.webp");
+  background-size: cover;
+  background-position: center;
+  mix-blend-mode: multiply;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.about__note::after {
+  /* Soft inner edge so the paper reads as a physical sheet, not a flat div. */
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.04), inset 0 1px 2px rgba(255, 255, 255, 0.4);
+  pointer-events: none;
+}
+
+.about__note-tape {
+  position: absolute;
+  top: -0.6rem;
+  left: 50%;
+  transform: translateX(-50%) rotate(-2deg);
+  width: 4.5rem;
+  height: 1.4rem;
+  background: linear-gradient(180deg, rgba(201, 162, 75, 0.55), rgba(201, 162, 75, 0.35));
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.18);
+  border-radius: 1px;
+}
+
+.about__note-number {
+  position: relative;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  color: var(--gold);
+}
+
+.about__note-title {
+  position: relative;
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.4vw, 1.9rem);
+  color: var(--about-note-text);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.about__note-body {
+  position: relative;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--about-note-text-secondary);
+  margin: 0;
+  line-height: 1.55;
+  max-width: 22rem;
+}
+
+.about__progress {
+  position: absolute;
+  left: clamp(1.5rem, 4vw, 3rem);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.about__tick {
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 999px;
+  background: var(--hairline);
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.about__tick.is-active {
+  background: var(--gold);
+  transform: scale(1.4);
+}
+
+.about__badge {
+  position: absolute;
+  right: clamp(1.5rem, 4vw, 3rem);
+  bottom: clamp(1.5rem, 4vw, 3rem);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-display);
+  color: var(--text-primary);
+  opacity: 0.85;
+}
+
+.about__badge-current {
+  font-size: 1.1rem;
+  color: var(--gold);
+}
+
+.about__badge i {
+  width: 1.1rem;
+  height: 1px;
+  background: var(--hairline);
+  display: inline-block;
+}
+
+.about__badge-total {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* ---- Reduced motion: static grid fallback, no pin/scrub ---- */
+.about--static .about__static-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1.5rem;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 0 clamp(1.5rem, 5vw, 4rem) var(--section-padding-y);
+}
+
+.about--static .about__note--static {
+  position: relative;
+  padding: 2rem;
+  background: var(--about-note-bg);
+  border-radius: 6px;
+  box-shadow: var(--about-note-shadow-ambient), var(--about-note-shadow-contact);
+}
+
+.about--static .about__note--static:nth-child(even) {
+  background: var(--about-note-bg-alt);
+}
+
+@media (max-width: 700px) {
+  .about__stack {
+    width: min(20rem, 84vw);
+    height: min(20rem, 46vh);
+  }
+
+  .about__progress,
+  .about__badge {
+    display: none;
+  }
+}
+
 /* ============ Services ============ */
 /* Panels are full-bleed dark photography — the overlay stays fixed
    regardless of site theme so it never fights the images (no cream/white
@@ -896,6 +1155,8 @@ button {
   --services-scrim-start: rgba(5, 6, 8, 0.92);
   --services-scrim-mid: rgba(5, 6, 8, 0.68);
   --services-text-primary: #f5f1e8;
+  --services-text-light-hover: hsl(34, 100%, 21%);
+  --services-text-light: hsl(0, 0%, 1%);
   --services-text-secondary: #cfc9bc;
   --services-eyebrow: #e8d9b5;
   --services-gold: #c9a24b;
@@ -1015,6 +1276,61 @@ button {
   background: var(--services-gold);
 }
 
+.services__skip-transition {
+  position: absolute;
+  z-index: 6;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--services-hairline);
+  background: rgba(10, 10, 12, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--services-text-secondary);
+  cursor: pointer;
+  transition: border-color 0.3s ease, color 0.3s ease, background 0.3s ease;
+}
+
+
+[data-theme="light"] .services__skip-transition {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(20, 20, 20, 0.16);
+  color: var(--services-text-light);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] .services__skip-transition {
+  background: rgba(10, 10, 12, 0.55);
+  border-color: rgba(255, 255, 255, 0.16);
+  color: var(--services-text-secondary);
+}
+
+.services__skip-transition:hover {
+  border-color: var(--services-gold);
+  color: var(--services-text-light-hover);
+}
+
+.services__skip-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--services-gold);
+  transition: background 0.3s ease;
+}
+
+.services__skip-transition.is-off .services__skip-dot {
+  background: var(--services-hairline);
+}
+
 .services__badge {
   position: absolute;
   z-index: 5;
@@ -1113,6 +1429,13 @@ button {
     font-size: 0.64rem;
   }
 
+  .services__skip-transition {
+    top: 5.75rem;
+    right: 1.25rem;
+    padding: 0.5rem 0.85rem;
+    font-size: 0.62rem;
+  }
+
   .services__progress {
     bottom: 1.6rem;
   }
@@ -1129,54 +1452,5 @@ button {
 
   .services__tick {
     transition: none;
-  }
-}
-
-/* Services transition skip control */
-.services__skip-transition {
-  position: absolute;
-  left: 2rem;
-  bottom: 2rem;
-  z-index: 50;
-  pointer-events: auto;
-  border: 1px solid rgba(255,255,255,.28);
-  background: rgba(255,255,255,.12);
-  backdrop-filter: blur(14px);
-  color: var(--services-text-primary);
-  padding: .45rem .8rem;
-  border-radius: 999px;
-  font-family: var(--font-body);
-  font-size: .68rem;
-  display: inline-flex;
-  align-items: center;
-  gap: .45rem;
-  letter-spacing: .04em;
-  cursor: pointer;
-  transition: transform .25s ease, background .25s ease, opacity .25s ease;
-}
-
-.services__skip-transition:hover {
-  transform: translateY(-2px);
-  background: rgba(255,255,255,.22);
-}
-
-.services__skip-transition.is-off {
-  background: rgba(255,255,255,.18);
-}
-
-.services__skip-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: currentColor;
-  opacity: .9;
-}
-
-@media (max-width: 700px) {
-  .services__skip-transition {
-    left: 1.25rem;
-    bottom: 4.75rem;
-    padding: .65rem 1rem;
-    font-size: .72rem;
   }
 }

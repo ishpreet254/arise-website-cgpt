@@ -3,12 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { getLenisInstance, isNavigating } from "@/lib/lenis";
 
 const SERVICES = [
   {
     number: "01",
     name: "Branding",
-    description: "Identity systems built to hold their shape — from wordmark to wayfinding.",
+    description: "Identity systems built to hold their shape from wordmark to wayfinding.",
     image: "/services/branding.webp",
     clip: null,
   },
@@ -75,26 +76,38 @@ export default function Services() {
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
-  const [skipTransition, setSkipTransition] = useState(false);
-  const skipTransitionRef = useRef(false);
-  const videoTransitionEnabledRef = useRef(true);
+  const [skipTransition, setSkipTransition] = useState(true);
+  const videoTransitionEnabledRef = useRef(false);
 
   const displayedIndexRef = useRef(0);
   const targetIndexRef = useRef(0);
   const isAnimatingRef = useRef(false);
-  const scrollLockRef = useRef(false);
   const unlockTimerRef = useRef(null);
   const transitionTimerRef = useRef(null);
   const lastDirectionRef = useRef(1);
 
-  // Pass 1: detect reduced-motion preference; drives which markup variant renders
   useEffect(() => {
     const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setReducedMotion(prefersReduced);
   }, []);
 
-  // Pass 2: pinned scroll sequence (skipped entirely for reduced motion)
+  useEffect(() => {
+    function handleNavigating(event) {
+      if (!event.detail) return;
+      // Drop any in-progress panel transition immediately so it can't
+      // hold a nav-triggered scroll hostage inside this section.
+      clearTimeout(unlockTimerRef.current);
+      clearTimeout(transitionTimerRef.current);
+      isAnimatingRef.current = false;
+      if (videoWrapRef.current) gsap.set(videoWrapRef.current, { autoAlpha: 0 });
+      getLenisInstance()?.start();
+    }
+
+    window.addEventListener("arise:navigating", handleNavigating);
+    return () => window.removeEventListener("arise:navigating", handleNavigating);
+  }, []);
+
   useEffect(() => {
     if (reducedMotion) return;
 
@@ -112,16 +125,15 @@ export default function Services() {
       const current = displayedIndexRef.current;
       if (requestedIndex === current || isAnimatingRef.current) return;
 
-      // Never skip cinematic transitions. Move only one service at a time.
       const nextIndex = requestedIndex > current ? current + 1 : current - 1;
       lastDirectionRef.current = nextIndex > current ? 1 : -1;
       isAnimatingRef.current = true;
-      scrollLockRef.current = true;
+      getLenisInstance()?.stop();
 
       clearTimeout(unlockTimerRef.current);
       unlockTimerRef.current = setTimeout(() => {
-        scrollLockRef.current = false;
         isAnimatingRef.current = false;
+        getLenisInstance()?.start();
       }, 10000);
 
       const settle = () => {
@@ -130,11 +142,10 @@ export default function Services() {
         });
         displayedIndexRef.current = nextIndex;
         isAnimatingRef.current = false;
-        scrollLockRef.current = false;
         clearTimeout(unlockTimerRef.current);
+        getLenisInstance()?.start();
         setActiveIndex(nextIndex);
 
-        // Catch up if the user scrolled during transition.
         if (targetIndexRef.current !== nextIndex) {
           runStep(targetIndexRef.current);
         }
@@ -148,7 +159,6 @@ export default function Services() {
         const video = videoRef.current;
         const videoWrap = videoWrapRef.current;
 
-        // Keep destination image ready to prevent previous image flash.
         gsap.set(nextPanel, { autoAlpha: 1 });
 
         video.pause();
@@ -164,6 +174,7 @@ export default function Services() {
           clearTimeout(fallbackTimer);
           video.onended = null;
           video.onerror = null;
+          video.ontimeupdate = null;
 
           if (!playbackWorked) {
             gsap.set(videoWrap, { autoAlpha: 0 });
@@ -174,13 +185,11 @@ export default function Services() {
           gsap.to(videoWrap, {
             autoAlpha: 0,
             duration: 0.18,
-            ease: 'power2.inOut',
+            ease: "power2.inOut",
             onComplete: settle,
           });
         };
 
-        // Video is optional. If it fails to start/finish within 5 seconds,
-        // use a clean fallback image transition.
         const fallbackTimer = setTimeout(() => finish(false), 5000);
         transitionTimerRef.current = fallbackTimer;
         video.onended = () => finish(true);
@@ -188,9 +197,8 @@ export default function Services() {
         video.ontimeupdate = () => {
           if (lastDirectionRef.current < 0 && video.currentTime <= 0.05) finish(true);
         };
+
         if (lastDirectionRef.current < 0) {
-          // Negative playbackRate is not supported reliably across browsers.
-          // Use a smooth image transition for upward movement instead.
           gsap.set(videoWrap, { autoAlpha: 0 });
           gsap.to(currentPanel, { autoAlpha: 0, duration: 0.35, ease: "power2.inOut" });
           gsap.fromTo(
@@ -219,7 +227,6 @@ export default function Services() {
       }
     };
 
-
     const ctx = gsap.context(() => {
       const isMobile = window.matchMedia("(max-width: 700px)").matches;
       const perPanelVh = isMobile ? 70 : 100;
@@ -239,6 +246,23 @@ export default function Services() {
             Math.floor(self.progress * (SERVICES.length - 1)),
           );
           targetIndexRef.current = idx;
+
+          if (isNavigating()) {
+            // A nav link is driving this scroll (e.g. jumping to Home or
+            // another section straight through the pinned Services stage).
+            // Snap the visible panel to match instead of stepping through
+            // the one-at-a-time transition and locking Lenis — that lock
+            // is what was trapping nav jumps inside this section.
+            if (idx !== displayedIndexRef.current) {
+              panels.forEach((el, i) => {
+                if (el) gsap.set(el, { autoAlpha: i === idx ? 1 : 0 });
+              });
+              displayedIndexRef.current = idx;
+              setActiveIndex(idx);
+            }
+            return;
+          }
+
           if (!isAnimatingRef.current && idx !== displayedIndexRef.current) {
             runStep(idx);
           }
@@ -246,36 +270,21 @@ export default function Services() {
       });
     }, root);
 
-    const preventScrollDuringTransition = (event) => {
-      if (scrollLockRef.current) {
-        event.preventDefault();
-        // Keep the 10 second emergency unlock alive only if the user is still trying to scroll.
-        clearTimeout(unlockTimerRef.current);
-        unlockTimerRef.current = setTimeout(() => {
-          scrollLockRef.current = false;
-          isAnimatingRef.current = false;
-        }, 10000);
-      }
-    };
-
-    window.addEventListener('wheel', preventScrollDuringTransition, { passive: false });
-    window.addEventListener('touchmove', preventScrollDuringTransition, { passive: false });
-
     const video = videoRef.current;
     return () => {
-      window.removeEventListener('wheel', preventScrollDuringTransition);
-      window.removeEventListener('touchmove', preventScrollDuringTransition);
       ctx.revert();
       video?.pause();
       clearTimeout(unlockTimerRef.current);
       clearTimeout(transitionTimerRef.current);
+      isAnimatingRef.current = false;
+      getLenisInstance()?.start();
     };
   }, [reducedMotion]);
 
-  // Pass 3: small reveal for the text block whenever the active service changes
   useEffect(() => {
     const content = contentRef.current;
     if (!content || reducedMotion) return;
+    gsap.killTweensOf(content);
     gsap.fromTo(
       content,
       { y: 14, autoAlpha: 0 },
@@ -352,7 +361,6 @@ export default function Services() {
           className={`services__skip-transition${skipTransition ? " is-off" : ""}`}
           onClick={() => {
             const nextState = !skipTransition;
-            skipTransitionRef.current = nextState;
             videoTransitionEnabledRef.current = !nextState;
             setSkipTransition(nextState);
 
@@ -370,7 +378,7 @@ export default function Services() {
           aria-pressed={skipTransition}
         >
           <span className="services__skip-dot" />
-          {skipTransition ? "Video OFF" : "Video ON"}
+          {skipTransition ? "Transition ON" : "Transition OFF"}
         </button>
 
         <div className="services__badge" aria-hidden="true">

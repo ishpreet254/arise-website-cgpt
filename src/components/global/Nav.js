@@ -1,6 +1,7 @@
  "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { getLenisInstance, setNavigating } from "@/lib/lenis";
 
 const STORAGE_KEY = "arise-theme";
 
@@ -18,6 +19,11 @@ const links = [
 export default function Nav() {
   const [open, setOpen] = useState(false);
   const [theme, setTheme] = useState("dark");
+  const navigatingTimeoutRef = useRef(null);
+
+  useEffect(() => {
+    return () => clearTimeout(navigatingTimeoutRef.current);
+  }, []);
 
   useEffect(() => {
     const stored = window.localStorage.getItem(STORAGE_KEY);
@@ -52,6 +58,44 @@ export default function Nav() {
     setOpen(false);
   }
 
+  function handleAnchorClick(event, href) {
+    if (!href.startsWith("#")) return;
+
+    const target = document.querySelector(href);
+    if (!target) return;
+
+    event.preventDefault();
+    closeMenu();
+
+    const top = href === "#hero" ? 0 : target.getBoundingClientRect().top + window.scrollY;
+    const lenis = getLenisInstance();
+    const duration = href === "#hero" ? 1.35 : 1.1;
+
+    window.history.pushState(null, "", href);
+
+    clearTimeout(navigatingTimeoutRef.current);
+    setNavigating(true);
+    const releaseNavigating = () => setNavigating(false);
+
+    if (lenis) {
+      // Make sure a pinned section (e.g. Services mid-transition) hasn't
+      // left Lenis paused, or this scrollTo would never actually move.
+      lenis.start();
+      lenis.scrollTo(top, {
+        duration,
+        easing: (t) => Math.min(1, 1.001 - 2 ** (-10 * t)),
+        onComplete: releaseNavigating,
+      });
+      // Safety net in case the scroll gets interrupted and onComplete
+      // never fires, so the flag doesn't stay stuck on.
+      navigatingTimeoutRef.current = setTimeout(releaseNavigating, duration * 1000 + 400);
+      return;
+    }
+
+    window.scrollTo({ top, behavior: "smooth" });
+    navigatingTimeoutRef.current = setTimeout(releaseNavigating, 1000);
+  }
+
   return (
     <>
       <header className={`site-nav${open ? " is-open" : ""}`}>
@@ -59,14 +103,14 @@ export default function Nav() {
           className="site-nav__brand"
           href="#hero"
           aria-label="ARISE — home"
-          onClick={closeMenu}
+          onClick={(event) => handleAnchorClick(event, "#hero")}
         >
           <img src="/logo/arise-logo.png" alt="ARISE" />
         </a>
 
         <nav className="site-nav__links" aria-label="Primary navigation">
           {links.slice(1, 5).map((link) => (
-            <a key={link.href} href={link.href}>
+            <a key={link.href} href={link.href} onClick={(event) => handleAnchorClick(event, link.href)}>
               <span>{link.label}</span>
             </a>
           ))}
@@ -115,7 +159,7 @@ export default function Nav() {
                 <a
                   key={link.href}
                   href={link.href}
-                  onClick={closeMenu}
+                  onClick={(event) => handleAnchorClick(event, link.href)}
                 >
                   <span className="nav-panel__number">
                     {String(index + 1).padStart(2, "0")}

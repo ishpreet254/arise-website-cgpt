@@ -1,4 +1,6 @@
 import CustomCursor from "@/components/global/CustomCursor";
+import SmoothScroll from "@/components/global/SmoothScroll";
+import "lenis/dist/lenis.css";
 import "./globals.css";
 
 export const metadata = {
@@ -36,6 +38,7 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body>
+        <SmoothScroll />
         <CustomCursor />
         {children}
       </body>
