@@ -1447,12 +1447,516 @@ button {
   }
 }
 
+/* ==========================================================================
+   Portfolio — gallery corridor
+   Environment (panorama/silhouette) is theme-reactive via image swap, not
+   via these tokens, so standard site tokens are used for the surrounding
+   chrome (captions, buttons, index counter, lightbox).
+   All portfolio__panorama / portfolio__frame / portfolio__silhouette visuals
+   below are PLACEHOLDER styling (dashed borders, flat tint, label text)
+   until real generated assets replace them — see Portfolio.js header comment.
+   ========================================================================== */
+
+.portfolio {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: var(--section-padding-y) 0;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.portfolio__eyebrow-row {
+  padding: 0 max(2.5rem, calc((100vw - 1280px) / 2 + 2.5rem));
+}
+
+.portfolio__eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--text-caption);
+  font-weight: 650;
+  letter-spacing: var(--tracking-caption);
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.portfolio__stage {
+  position: relative;
+  height: min(60vh, 620px);
+  width: 100%;
+  overflow: hidden;
+}
+
+.portfolio__panorama-viewport {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  animation: portfolio-ambient-breathe 14s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes portfolio-ambient-breathe {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.025);
+  }
+}
+
+.portfolio__panorama {
+  position: absolute;
+  inset: 0;
+  background-color: var(--surface);
+  /* Tiles infinitely along X so walking never runs out of wall — this layer
+     is never transformed directly; it's panned by animating
+     background-position-x (see goTo in Portfolio.js), in lockstep with
+     .portfolio__track below. background-size: auto 100% keeps the texture
+     cropped to the box's height (no vertical overflow) while width follows
+     the source image's natural aspect ratio and repeats seamlessly. */
+  background-size: auto 100%;
+  background-position-x: 0;
+  background-position-y: center;
+  background-repeat: repeat-x;
+}
+
+.portfolio__track {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+.portfolio__frame-slot {
+  position: absolute;
+  top: 12%;
+  bottom: 30%;
+  width: var(--frame-slot-width, 26vw);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.portfolio__frame-ground-shadow {
+  position: absolute;
+  bottom: -6%;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0) 72%);
+  pointer-events: none;
+}
+
+.portfolio__frame-ground-shadow--landscape {
+  width: min(24vw, 350px);
+}
+
+.portfolio__frame-ground-shadow--portrait {
+  width: min(14vw, 230px);
+}
+
+.portfolio__frame {
+  position: relative;
+  width: min(20vw, 320px);
+  height: 100%;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  /* All on-screen frames (active + both neighbors) render at full sharpness
+     and opacity — no depth blur/dimming — so all three stay clearly visible
+     and clickable, per brief. The active frame is still distinguished via
+     the gold border + shadow in .is-active below. */
+  transition: transform 0.6s var(--ease-spring);
+}
+
+.portfolio__frame:hover {
+  transform: translateY(-4px);
+}
+
+.portfolio__frame--landscape {
+  aspect-ratio: 3 / 2;
+  width: min(26vw, 380px);
+  height: auto;
+}
+
+.portfolio__frame--portrait {
+  aspect-ratio: 5 / 6;
+  width: min(16vw, 260px);
+  height: auto;
+}
+
+/* Real frame-overlay PNGs are loaded now, but their canvas includes
+   transparent padding above/below the ornate border art itself (per
+   FRAME_INSETS). This element used to fill that same box with a solid
+   cream background + gold border as a pre-asset placeholder — with real
+   art in place, that fill was bleeding through the overlay's transparent
+   margins as a white/cream bar above and below each frame. Fill/border
+   removed; only the active-state elevation shadow remains. */
+.portfolio__frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 0.4rem;
+  pointer-events: none;
+}
+
+.portfolio__frame-slot.is-active .portfolio__frame::before {
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.35);
+}
+
+.portfolio__frame-canvas {
+  position: absolute;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-raised);
+}
+
+.portfolio__frame-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.portfolio__frame-overlay {
+  position: absolute;
+  inset: 0;
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+.portfolio__ground-anchor {
+  position: absolute;
+  /* Fixed near the left edge of the stage (not centered) — the silhouette
+     stands still here, facing right, toward whatever frame is currently
+     panned to its fixed resting spot (see START_OFFSET_VW in Portfolio.js).
+     Only the frames/wall move; the person doesn't travel with them. */
+  left: 10vw;
+  bottom: 4%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+}
+
+.portfolio__silhouette-shadow {
+  width: 110px;
+  height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0) 75%);
+  margin-top: -10px;
+  will-change: transform, opacity;
+  transform-origin: center;
+}
+
+.portfolio__silhouette {
+  width: 140px;
+  height: 260px;
+  /* No background-color fill here — that was a placeholder box tint from
+     before the real silhouette PNGs existed. With real art in place, a
+     fill behind a non-full-bleed transparent PNG shows through as a grey
+     capsule around the figure, so it's removed now that real assets load. */
+  background-size: contain;
+  background-position: bottom center;
+  background-repeat: no-repeat;
+  filter: drop-shadow(0 14px 10px rgba(0, 0, 0, 0.3));
+  will-change: transform;
+  transform-origin: bottom center;
+}
+
+.portfolio__caption {
+  padding: 0 max(2.5rem, calc((100vw - 1280px) / 2 + 2.5rem));
+  text-align: center;
+}
+
+.portfolio__caption-title {
+  font-family: var(--font-display);
+  font-size: var(--text-display-l);
+  color: var(--text-primary);
+}
+
+.portfolio__caption-category {
+  font-family: var(--font-body);
+  font-size: var(--text-caption);
+  letter-spacing: var(--tracking-caption);
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-top: 0.4rem;
+}
+
+.portfolio__controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+}
+
+.portfolio__nav-button {
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--radius-button);
+  border: 1px solid var(--hairline);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.35s var(--ease-spring), transform 0.35s var(--ease-spring);
+}
+
+.portfolio__nav-button:hover:not(:disabled) {
+  background: var(--gold);
+  color: var(--bg);
+  transform: translateY(-2px);
+}
+
+.portfolio__nav-button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.portfolio__index {
+  font-family: var(--font-body);
+  font-size: var(--text-caption);
+  letter-spacing: var(--tracking-caption);
+  color: var(--text-secondary);
+  min-width: 4.5rem;
+  text-align: center;
+}
+
+.portfolio__placeholder-label {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+/* ---- Reduced-motion static fallback ---- */
+.portfolio--static {
+  min-height: auto;
+}
+
+.portfolio__static-header {
+  padding: 0 max(2.5rem, calc((100vw - 1280px) / 2 + 2.5rem));
+  margin-bottom: 1.5rem;
+}
+
+.portfolio__heading {
+  font-family: var(--font-display);
+  font-size: var(--text-display-l);
+  color: var(--text-primary);
+  margin-top: 0.4rem;
+}
+
+.portfolio__static-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  padding: 0 max(2.5rem, calc((100vw - 1280px) / 2 + 2.5rem));
+}
+
+.portfolio__static-card {
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  padding: 0;
+}
+
+.portfolio__static-frame {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  border: 8px solid var(--gold-champagne);
+  border-radius: 0.4rem;
+  background: var(--surface-raised);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+  overflow: hidden;
+}
+
+.portfolio__static-frame-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.portfolio__static-title {
+  font-family: var(--font-display);
+  color: var(--text-primary);
+  font-size: 1.05rem;
+}
+
+.portfolio__static-category {
+  font-family: var(--font-body);
+  font-size: var(--text-caption);
+  color: var(--text-secondary);
+  margin-top: 0.2rem;
+}
+
+/* ---- Lightbox ----
+   Full-bleed expand restyled to match the Services panel language (full
+   image, bottom gradient scrim, caption pinned bottom-left) rather than a
+   centered modal card — same visual system, portfolio-specific content. */
+.portfolio-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+}
+
+.portfolio-lightbox__backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background: rgba(5, 6, 8, 0.85);
+  cursor: pointer;
+}
+
+.portfolio-lightbox__stage {
+  position: absolute;
+  inset: clamp(0px, 2vw, 28px);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  background: #000;
+  box-shadow: var(--panel-shadow);
+  animation: portfolio-lightbox-in 0.4s var(--ease-spring);
+}
+
+@keyframes portfolio-lightbox-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.portfolio-lightbox__image-el {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+
+.portfolio-lightbox__fallback-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--services-text-secondary, var(--text-secondary));
+}
+
+.portfolio-lightbox__scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(0deg, var(--services-scrim-start, rgba(5, 6, 8, 0.92)) 0%, var(--services-scrim-mid, rgba(5, 6, 8, 0.68)) 26%, transparent 55%);
+}
+
+.portfolio-lightbox__close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 2;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  border: 1px solid var(--services-hairline, rgba(255, 255, 255, 0.22));
+  background: rgba(10, 10, 12, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--services-text-primary, #f5f1e8);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.3s ease, background 0.3s ease;
+}
+
+.portfolio-lightbox__close:hover {
+  border-color: var(--services-gold, #c9a24b);
+}
+
+.portfolio-lightbox__caption {
+  position: absolute;
+  z-index: 2;
+  left: clamp(1.5rem, 4vw, 3rem);
+  bottom: clamp(1.75rem, 5vh, 3rem);
+  max-width: 34rem;
+}
+
+.portfolio-lightbox__eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--text-caption);
+  font-weight: 650;
+  letter-spacing: var(--tracking-caption);
+  text-transform: uppercase;
+  color: var(--services-eyebrow, var(--gold));
+}
+
+.portfolio-lightbox__title {
+  margin-top: 0.6rem;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.6rem, 3vw, 2.6rem);
+  line-height: 1.1;
+  color: var(--services-text-primary, #f5f1e8);
+}
+
+.portfolio-lightbox__category {
+  margin-top: 0.5rem;
+  font-family: var(--font-body);
+  font-size: var(--text-caption);
+  letter-spacing: var(--tracking-caption);
+  text-transform: uppercase;
+  color: var(--services-text-secondary, #cfc9bc);
+}
+
+@media (max-width: 700px) {
+  .portfolio__stage {
+    height: min(48vh, 460px);
+  }
+
+  .portfolio__frame {
+    width: min(48vw, 260px);
+  }
+
+  .portfolio__caption-title {
+    font-size: 1.6rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero__button {
     transition: none;
   }
 
   .services__tick {
+    transition: none;
+  }
+
+  .portfolio__frame {
     transition: none;
   }
 }

@@ -37,7 +37,7 @@ export default function RootLayout({ children }) {
           href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap"
         />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <SmoothScroll />
         <CustomCursor />
         {children}
