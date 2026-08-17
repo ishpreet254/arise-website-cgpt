@@ -63,7 +63,7 @@ const START_OFFSET_VW = 42;
 // bottom are larger than left/right because that canvas has empty padding
 // above and below the frame artwork itself, not just border thickness.
 const FRAME_INSETS = {
-  landscape: { top: "21.48%", right: "8.85%", bottom: "25.78%", left: "8.59%" },
+  landscape: { top: "9.57%", right: "6.90%", bottom: "11.13%", left: "6.90%" },
   portrait: { top: "11.64%", right: "14.41%", bottom: "12.15%", left: "14.32%" },
 };
 
@@ -561,6 +561,24 @@ export default function Portfolio() {
       <div className="portfolio__caption" key={activeItem.slug}>
         <p className="portfolio__caption-title">{activeItem.title}</p>
         <p className="portfolio__caption-category">{activeItem.category}</p>
+      </div>
+
+      {/* Wayfinding row — same tick-mark language as Services__progress, so the
+          two sequential-content sections read as one system. Each tick is a
+          real jump-to-piece control (goTo already guards range + in-flight
+          walks), not just a decorative dot. */}
+      <div className="portfolio__ticks" role="tablist" aria-label="Jump to piece">
+        {PORTFOLIO_ITEMS.map((item, index) => (
+          <button
+            key={item.slug}
+            type="button"
+            role="tab"
+            className={`portfolio__tick ${index === activeIndex ? "is-active" : ""}`}
+            aria-selected={index === activeIndex}
+            aria-label={item.title}
+            onClick={() => index !== activeIndex && goTo(index, index > activeIndex ? "next" : "prev")}
+          />
+        ))}
       </div>
 
       <div className="portfolio__controls">
