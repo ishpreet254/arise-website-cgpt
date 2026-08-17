@@ -2336,6 +2336,515 @@ button {
   }
 }
 
+/* ==========================================================================
+   FAQ — hybrid cloud sky: scroll between two parts, free-float within each
+   Three-layer transform separation, deliberate:
+     .faq__cloud-wrap  → static placement (left/top position, scale, rotate)
+     .faq__cloud-anim  → GSAP-owned (continuous horizontal drift)
+     .faq__cloud       → CSS-owned ambient float loop (translate, not transform)
+   Keeping these on three different elements means GSAP and the CSS
+   keyframe animation never fight over the same `transform` property.
+   Part 1 (3 clouds) is one viewport; Part 2 (4 clouds) is a taller canvas
+   so only 2–3 clouds are ever in frame — the user reaches it with normal
+   page scroll, no pin/scroll-jack. Click reveal is a full-screen lightbox
+   (question left / answer right), matching the Portfolio/Services pattern.
+   ========================================================================== */
+
+.faq {
+  position: relative;
+  background: var(--bg);
+}
+
+/* Applied by an IntersectionObserver in FAQ.js while the section is off
+   screen — halts the CSS-driven float/ambient loops (GSAP drift is paused
+   directly) so a scrolled-past FAQ stops costing frames. */
+.faq--paused .faq__cloud,
+.faq--paused .faq__ambient--a,
+.faq--paused .faq__ambient--b {
+  animation-play-state: paused;
+}
+
+.faq__stage {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.faq__stage--one {
+  height: 100vh;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 100vh;
+}
+
+.faq__stage--two {
+  height: 172.5vh;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 172.5vh;
+}
+
+.faq__backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: opacity 0.4s ease;
+}
+
+/* ---- Ambient drifting background clouds — decorative, behind the interactive sky.
+   Driven by `transform` (compositor-only) rather than `background-position`,
+   which forces a full repaint on every frame — this is the same seamless
+   loop, just far cheaper to render. ---- */
+.faq__ambient {
+  position: absolute;
+  inset: -20% -100%;
+  z-index: 0;
+  background-repeat: repeat-x;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.faq__ambient--a {
+  background-size: 1500px auto;
+  background-position: 0 15%;
+  opacity: 0.55;
+  filter: blur(5px);
+  animation: faq-ambient-drift-a 130s linear infinite;
+}
+
+.faq__ambient--b {
+  background-size: 1000px auto;
+  background-position: 0 58%;
+  opacity: 0.35;
+  filter: blur(7px);
+  animation: faq-ambient-drift-b 170s linear infinite reverse;
+}
+
+@keyframes faq-ambient-drift-a {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-1500px);
+  }
+}
+
+@keyframes faq-ambient-drift-b {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-1000px);
+  }
+}
+
+.faq__eyebrow-row {
+  position: relative;
+  z-index: 2;
+  padding: clamp(3rem, 7vw, 5rem) max(2.5rem, calc((100vw - 1280px) / 2 + 2.5rem)) 0;
+  text-align: center;
+}
+
+.faq__eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--text-caption);
+  font-weight: 650;
+  letter-spacing: var(--tracking-caption);
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0 0 0.75rem;
+}
+
+.faq__heading {
+  font-family: var(--font-display);
+  font-size: var(--text-display-l);
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.1;
+}
+
+.faq__sky {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  width: 100%;
+}
+
+.faq__sky--tall {
+  min-height: 100%;
+}
+
+.faq__cloud-wrap {
+  position: absolute;
+  transform: translate(-50%, -50%) scale(var(--faq-scale, 1)) rotate(var(--faq-rotate, 0deg));
+  transform-origin: center;
+}
+
+.faq__cloud-anim {
+  position: relative;
+  will-change: transform;
+}
+
+.faq__cloud {
+  position: relative;
+  display: block;
+  width: clamp(14rem, 22vw, 21rem);
+  background-color: transparent;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: none;
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 0;
+  cursor: pointer;
+  filter: drop-shadow(0 16px 22px rgba(0, 0, 0, 0.3));
+  animation: faq-float 9s ease-in-out infinite;
+  translate: 0 0;
+  transition: filter 0.35s ease;
+}
+
+.faq__cloud:hover,
+.faq__cloud.is-open {
+  filter: drop-shadow(0 19px 26px rgba(0, 0, 0, 0.38));
+}
+
+/* Per-shape sizing — every shape sized up to a near-equal footprint (by
+   apparent area, not raw width, since each source image has its own
+   proportions) so the sky reads as one consistent family of clouds rather
+   than a hero cloud among smaller ones. Each also carries its vertical
+   text anchor, measured from the source art's actual opaque-pixel mass so
+   copy sits on the puff, not beside it. */
+.faq__cloud--wide {
+  width: clamp(30rem, 42vw, 46rem);
+  --faq-text-y: 60%;
+}
+
+.faq__cloud--tall {
+  width: clamp(23rem, 34vw, 36rem);
+  --faq-text-y: 56%;
+}
+
+.faq__cloud--round {
+  width: clamp(22rem, 33vw, 35rem);
+  --faq-text-y: 51%;
+}
+
+.faq__cloud--wispy {
+  width: clamp(27rem, 40vw, 43rem);
+  --faq-text-y: 53%;
+}
+
+.faq__cloud-question {
+  position: absolute;
+  left: 50%;
+  top: var(--faq-text-y, 50%);
+  transform: translate(-50%, -50%);
+  width: 68%;
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1rem, 1.5vw, 1.4rem);
+  line-height: 1.38;
+  letter-spacing: 0.008em;
+  color: var(--text-primary);
+  text-align: center;
+  text-wrap: balance;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.16);
+}
+
+@keyframes faq-float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -8px;
+  }
+}
+
+/* ---- Scroll cue between Part 1 and Part 2 ---- */
+.faq__scroll-cue {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(1.75rem, 4vw, 2.75rem);
+  z-index: 2;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+.faq__scroll-cue-line {
+  width: 1px;
+  height: 2.75rem;
+  background: linear-gradient(to bottom, var(--gold), transparent);
+  animation: faq-scroll-cue-run 2.2s ease-in-out infinite;
+}
+
+@keyframes faq-scroll-cue-run {
+  0% {
+    transform: scaleY(0.3);
+    transform-origin: top;
+    opacity: 0.3;
+  }
+  50% {
+    transform: scaleY(1);
+    transform-origin: top;
+    opacity: 1;
+  }
+  100% {
+    transform: scaleY(0.3);
+    transform-origin: bottom;
+    opacity: 0.3;
+  }
+}
+
+/* ---- Soft blend where Part 1 meets Part 2, so the seam reads as one sky ---- */
+.faq__part-fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  height: 20vh;
+  background: linear-gradient(to bottom, transparent, var(--bg));
+  pointer-events: none;
+}
+
+.faq__part-fade--top {
+  bottom: auto;
+  top: 0;
+  background: linear-gradient(to bottom, var(--bg), transparent);
+}
+
+/* ---- Full-screen answer reveal — question left / answer right ---- */
+.faq__lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1.5rem, 5vw, 3rem);
+}
+
+.faq__lightbox-backdrop {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(20px) saturate(120%);
+  -webkit-backdrop-filter: blur(20px) saturate(120%);
+}
+
+.faq__lightbox-panel {
+  position: relative;
+  width: min(64rem, 92vw);
+  max-height: 82vh;
+  overflow: auto;
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+  align-items: center;
+  gap: clamp(1.75rem, 3.5vw, 3.5rem);
+  padding: clamp(2rem, 5vw, 3.5rem);
+  border-radius: var(--radius-card);
+  border: 1px solid var(--glass-border);
+  background: color-mix(in srgb, var(--glass-tint) 92%, transparent);
+  box-shadow: var(--glass-inner-highlight), var(--shadow-soft);
+  animation: faq-lightbox-in 0.4s var(--ease-spring);
+}
+
+@keyframes faq-lightbox-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.faq__lightbox-divider {
+  align-self: stretch;
+  background: var(--hairline);
+}
+
+.faq__lightbox-eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--text-caption);
+  font-weight: 650;
+  letter-spacing: var(--tracking-caption);
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0 0 0.75rem;
+}
+
+.faq__lightbox-question h3 {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.4vw, 2rem);
+  color: var(--text-primary);
+  line-height: 1.25;
+  margin: 0;
+}
+
+.faq__lightbox-answer p {
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 1.3vw, 1.15rem);
+  line-height: 1.65;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.faq__lightbox-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+.faq__lightbox-close:hover {
+  background: var(--glass-border);
+  color: var(--text-primary);
+}
+
+/* ---- Reduced motion: static Q&A accordion list, no clouds/sky/drift ---- */
+.faq--static {
+  padding: var(--section-padding-y) 0;
+}
+
+.faq__static-header {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 0 clamp(1.5rem, 5vw, 4rem) clamp(2rem, 4vw, 3rem);
+  text-align: center;
+}
+
+.faq__static-header .faq__eyebrow {
+  display: block;
+}
+
+.faq__static-list {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 0 clamp(1.5rem, 5vw, 4rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.faq__static-item {
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-card);
+  padding: 1.1rem 1.4rem;
+  background: var(--surface-raised);
+}
+
+.faq__static-question {
+  font-family: var(--font-body);
+  font-weight: 650;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.faq__static-answer {
+  font-family: var(--font-body);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0.75rem 0 0;
+}
+
+@media (max-width: 700px) {
+  .faq__stage--one {
+    height: 100svh;
+    contain-intrinsic-size: auto 100svh;
+  }
+
+  .faq__stage--two {
+    height: 198.75svh;
+    contain-intrinsic-size: auto 198.75svh;
+  }
+
+  .faq__cloud--wide {
+    width: clamp(17rem, 72vw, 21.5rem);
+  }
+
+  .faq__cloud--wispy {
+    width: clamp(16rem, 68vw, 20.5rem);
+  }
+
+  .faq__cloud--tall {
+    width: clamp(14.5rem, 56vw, 17.5rem);
+  }
+
+  .faq__cloud--round {
+    width: clamp(14rem, 54vw, 17rem);
+  }
+
+  .faq__cloud-question {
+    font-size: 0.88rem;
+    width: 72%;
+  }
+
+  .faq__scroll-cue {
+    bottom: 1.5rem;
+  }
+
+  .faq__ambient--a {
+    background-size: 900px auto;
+    animation: faq-ambient-drift-a-m 95s linear infinite;
+  }
+
+  .faq__ambient--b {
+    background-size: 650px auto;
+    animation: faq-ambient-drift-b-m 130s linear infinite reverse;
+  }
+
+  .faq__lightbox-panel {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    width: min(30rem, 94vw);
+    max-height: 86vh;
+  }
+
+  .faq__lightbox-divider {
+    width: 100%;
+    height: 1px;
+  }
+}
+
+@keyframes faq-ambient-drift-a-m {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-900px);
+  }
+}
+
+@keyframes faq-ambient-drift-b-m {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-650px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero__button {
     transition: none;
