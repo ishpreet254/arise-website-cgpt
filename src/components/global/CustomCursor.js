@@ -1,9 +1,15 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import {
+  CURSOR_EVENT,
+  CURSOR_STORAGE_KEY,
+  getStoredCursorPreference,
+} from "@/lib/cursorPreference";
 
 export default function CustomCursor() {
   const [mounted, setMounted] = useState(false);
+  const [enabled, setEnabled] = useState(false);
   const dotRef = useRef(null);
   const ringRef = useRef(null);
 
@@ -13,9 +19,35 @@ export default function CustomCursor() {
     setMounted(true);
   }, []);
 
+  // Read the stored on/off preference once mounted, and stay in sync with
+  // the nav toggle (same-tab CustomEvent) and other tabs (storage event).
+  // The toggle lives in Nav.js, a sibling of this component, so a shared
+  // event is how the two stay in sync without lifting state up.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setEnabled(getStoredCursorPreference());
+
+    function onToggle(event) {
+      setEnabled(Boolean(event.detail));
+    }
+
+    function onStorage(event) {
+      if (event.key === CURSOR_STORAGE_KEY) {
+        setEnabled(event.newValue === "on");
+      }
+    }
+
+    window.addEventListener(CURSOR_EVENT, onToggle);
+    window.addEventListener("storage", onStorage);
+    return () => {
+      window.removeEventListener(CURSOR_EVENT, onToggle);
+      window.removeEventListener("storage", onStorage);
+    };
+  }, []);
+
   // Pass 2: Initialize physics and event listeners only after mounting on the client
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || !enabled) return;
 
     // Hardware & Pointer Detection
     const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
@@ -90,10 +122,11 @@ export default function CustomCursor() {
       document.removeEventListener("pointerout", setHover);
       cancelAnimationFrame(rafId);
     };
-  }, [mounted]);
+  }, [mounted, enabled]);
 
-  // Render nothing on SSR and during initial hydration pass
-  if (!mounted) return null;
+  // Render nothing on SSR/initial hydration, and nothing at all while the
+  // custom cursor is switched off (default state).
+  if (!mounted || !enabled) return null;
 
   return (
     <>

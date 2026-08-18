@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { getLenisInstance, setNavigating } from "@/lib/lenis";
+import { getStoredCursorPreference, setCursorPreference } from "@/lib/cursorPreference";
 
 const STORAGE_KEY = "arise-theme";
 
@@ -19,6 +20,7 @@ const links = [
 export default function Nav() {
   const [open, setOpen] = useState(false);
   const [theme, setTheme] = useState("dark");
+  const [customCursor, setCustomCursor] = useState(false);
   const navigatingTimeoutRef = useRef(null);
 
   useEffect(() => {
@@ -32,6 +34,11 @@ export default function Nav() {
       setTheme(stored);
       document.documentElement.setAttribute("data-theme", stored);
     }
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setCustomCursor(getStoredCursorPreference());
   }, []);
 
   useEffect(() => {
@@ -52,6 +59,11 @@ export default function Nav() {
     setTheme(nextTheme);
     document.documentElement.setAttribute("data-theme", nextTheme);
     window.localStorage.setItem(STORAGE_KEY, nextTheme);
+  }
+
+  function toggleCustomCursor(nextEnabled) {
+    setCustomCursor(nextEnabled);
+    setCursorPreference(nextEnabled);
   }
 
   function closeMenu() {
@@ -201,6 +213,28 @@ export default function Nav() {
                   aria-pressed={theme === "light"}
                 >
                   Light
+                </button>
+              </div>
+            </div>
+
+            <div className="nav-panel__theme">
+              <span className="nav-panel__label">Cursor</span>
+              <div className="theme-switch" role="group" aria-label="Custom cursor">
+                <button
+                  type="button"
+                  className={!customCursor ? "is-active" : ""}
+                  onClick={() => toggleCustomCursor(false)}
+                  aria-pressed={!customCursor}
+                >
+                  Off
+                </button>
+                <button
+                  type="button"
+                  className={customCursor ? "is-active" : ""}
+                  onClick={() => toggleCustomCursor(true)}
+                  aria-pressed={customCursor}
+                >
+                  On
                 </button>
               </div>
             </div>

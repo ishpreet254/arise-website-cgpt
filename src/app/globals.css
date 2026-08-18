@@ -19,7 +19,7 @@ body {
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
-  cursor: none;
+  cursor: auto;
 }
 
 body.nav-open {
@@ -28,7 +28,7 @@ body.nav-open {
 
 @media (pointer: coarse) {
   body {
-    cursor: auto;
+    cursor: auto !important;
   }
 }
 
@@ -156,6 +156,11 @@ button {
 }
 
 .menu-trigger {
+  /* Pin to the last explicit column regardless of auto-placement — once
+     .site-nav__links is display:none on mobile, grid auto-placement would
+     otherwise slot this into the (now first available) middle "auto"
+     track instead of the right-hand column, throwing it out of position. */
+  grid-column: 3;
   justify-self: end;
   width: 8rem;
   height: 3.15rem;
@@ -168,7 +173,7 @@ button {
   border-radius: 999px;
   background: var(--menu-bg);
   color: var(--text-primary);
-  cursor: none;
+  cursor: pointer;
   transition:
     background-color 0.4s var(--ease-spring),
     border-color 0.4s var(--ease-spring),
@@ -321,7 +326,7 @@ button {
   border: 0;
   background: transparent;
   color: var(--nav-muted);
-  cursor: none;
+  cursor: pointer;
   font-size: 0.62rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -446,7 +451,7 @@ button {
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  cursor: none;
+  cursor: pointer;
   transition:
     color 0.35s var(--ease-spring),
     background-color 0.35s var(--ease-spring);
@@ -464,6 +469,15 @@ button {
 }
 
 /* ---------- Custom Cursor (Aesthetic & Minimal) ---------- */
+/* Off by default — the native cursor only hides once the nav-panel
+   toggle switches it on (html[data-custom-cursor="on"]). */
+
+html[data-custom-cursor="on"] body,
+html[data-custom-cursor="on"] .menu-trigger,
+html[data-custom-cursor="on"] .nav-panel__close,
+html[data-custom-cursor="on"] .theme-switch button {
+  cursor: none;
+}
 
 .cursor-dot {
   position: fixed;
@@ -518,7 +532,16 @@ button {
   .custom-cursor {
     display: none;
   }
+}
 
+/* The nav submenu's two-column layout (link list + aside rail) needs to
+   collapse to a single stacked column on mobile — this was previously (and
+   incorrectly) scoped to `prefers-reduced-motion: reduce` above, so on an
+   ordinary phone without that OS setting enabled, the panel kept its
+   desktop two-column grid. With a `minmax(12rem, 0.7fr)` aside column plus
+   the link list's own minimum content width, that's wider than the panel
+   itself, which forced the horizontal scroll/swipe to see the rest of it. */
+@media (max-width: 700px) {
   .nav-panel__body {
     grid-template-columns: 1fr;
   }
@@ -588,8 +611,14 @@ button {
 
   .nav-panel__aside {
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr 1fr;
     gap: 1rem;
+  }
+
+  /* Statement text spans the full width on its own row; the two toggle
+     groups (Appearance, Cursor) fall into the row below it, side by side. */
+  .nav-panel__statement {
+    grid-column: 1 / -1;
   }
 
   .nav-panel__theme {
@@ -1432,8 +1461,13 @@ button {
   }
 
   .services__skip-transition {
+    /* Must clear bottom/left from the base rule too — leaving them set
+       alongside the new top/right pins all four edges with no explicit
+       size, which stretches the button to fill the entire section. */
     top: 5.75rem;
     right: 1.25rem;
+    bottom: auto;
+    left: auto;
     padding: 0.5rem 0.85rem;
     font-size: 0.62rem;
   }
@@ -2318,12 +2352,21 @@ button {
 }
 
 @media (max-width: 700px) {
+  /* The newspaper is a single baked-text image with no separate text
+     layer, so on a narrow phone the only lever for legibility is size —
+     tighten the section's other spacing and let the card claim as much of
+     the viewport as it reasonably can instead of shrinking proportionally
+     with the rest of the desktop composition. */
+  .testimonials {
+    gap: 1.1rem;
+  }
+
   .testimonials__stage {
-    height: min(50vh, 460px);
+    height: min(64vh, 560px);
   }
 
   .testimonials__cards {
-    width: min(86vw, 620px);
+    width: min(96vw, 640px);
   }
 
   .testimonials__footer-row {
