@@ -917,6 +917,22 @@ html[data-custom-cursor="on"] .theme-switch button {
   }
 }
 
+/* ---- Mobile-only image overrides ----
+   Phone-specific crops of the hero background, swapped in only at the same
+   <= 700px breakpoint used above (where .hero__video is already hidden in
+   favor of .hero__image). !important is required here because the base
+   image is set via an inline style in Hero.js — this rule only wins inside
+   this media query, so desktop is completely unaffected. */
+@media (max-width: 700px) {
+  [data-theme="dark"] .hero__image {
+    background-image: url("/hero/hero-dark-mobile.webp") !important;
+  }
+
+  [data-theme="light"] .hero__image {
+    background-image: url("/hero/hero-light-mobile.webp") !important;
+  }
+}
+
 /* ============ About ============ */
 /* Sticky-note stack on a fabric board. Board texture swaps per theme;
    note paper stays a consistent warm off-white in both themes (real
@@ -1486,6 +1502,55 @@ html[data-custom-cursor="on"] .theme-switch button {
 
   .services__static-content {
     padding: 2.5rem 1.5rem;
+  }
+}
+
+/* ---- Mobile-only image overrides ----
+   Phone-specific crops for each service panel, covering both the pinned
+   scroll stage (.services__panel) and the reduced-motion static fallback
+   (.services__static-image). Order matches the SERVICES array in
+   Services.js. Scoped to the same <= 700px breakpoint used above; the base
+   images are set via inline styles in Services.js, so !important is needed
+   to win inside this media query only — desktop is completely unaffected. */
+@media (max-width: 700px) {
+  .services__panel:nth-of-type(1),
+  .services__static-panel:nth-of-type(1) .services__static-image {
+    background-image: url("/services/branding-mobile.webp") !important;
+  }
+
+  .services__panel:nth-of-type(2),
+  .services__static-panel:nth-of-type(2) .services__static-image {
+    background-image: url("/services/design-mobile.webp") !important;
+  }
+
+  .services__panel:nth-of-type(3),
+  .services__static-panel:nth-of-type(3) .services__static-image {
+    background-image: url("/services/web-design-mobile.webp") !important;
+  }
+
+  .services__panel:nth-of-type(4),
+  .services__static-panel:nth-of-type(4) .services__static-image {
+    background-image: url("/services/software-development-mobile.webp") !important;
+  }
+
+  .services__panel:nth-of-type(5),
+  .services__static-panel:nth-of-type(5) .services__static-image {
+    background-image: url("/services/ai-automation-mobile.webp") !important;
+  }
+
+  .services__panel:nth-of-type(6),
+  .services__static-panel:nth-of-type(6) .services__static-image {
+    background-image: url("/services/business-analytics-mobile.webp") !important;
+  }
+
+  .services__panel:nth-of-type(7),
+  .services__static-panel:nth-of-type(7) .services__static-image {
+    background-image: url("/services/digital-marketing-mobile.webp") !important;
+  }
+
+  .services__panel:nth-of-type(8),
+  .services__static-panel:nth-of-type(8) .services__static-image {
+    background-image: url("/services/e-commerce-mobile.webp") !important;
   }
 }
 
