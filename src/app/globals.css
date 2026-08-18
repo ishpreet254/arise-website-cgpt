@@ -1230,6 +1230,14 @@ html[data-custom-cursor="on"] .theme-switch button {
   position: absolute;
   inset: 0;
   z-index: 2;
+  /* Solid fallback fill behind the <video> element itself. The wrap is
+     made visible the instant a transition starts, but the freshly-loaded
+     clip has no decoded frame yet — without an opaque background here,
+     that gap renders transparent and briefly reveals the next service's
+     panel image underneath (already at full opacity so the no-video
+     fallback crossfade still works), instead of hiding it until the video
+     actually starts painting. */
+  background: #050608;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -2421,9 +2429,9 @@ html[data-custom-cursor="on"] .theme-switch button {
 }
 
 .faq__stage--two {
-  height: 172.5vh;
+  height: 150vh;
   content-visibility: auto;
-  contain-intrinsic-size: auto 172.5vh;
+  contain-intrinsic-size: auto 150vh;
 }
 
 .faq__backdrop {
@@ -2562,17 +2570,17 @@ html[data-custom-cursor="on"] .theme-switch button {
    copy sits on the puff, not beside it. */
 .faq__cloud--wide {
   width: clamp(30rem, 42vw, 46rem);
-  --faq-text-y: 60%;
+  --faq-text-y: 62%;
 }
 
 .faq__cloud--tall {
   width: clamp(23rem, 34vw, 36rem);
-  --faq-text-y: 56%;
+  --faq-text-y: 60%;
 }
 
 .faq__cloud--round {
   width: clamp(22rem, 33vw, 35rem);
-  --faq-text-y: 51%;
+  --faq-text-y: 57%;
 }
 
 .faq__cloud--wispy {
