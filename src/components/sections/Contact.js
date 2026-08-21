@@ -61,7 +61,7 @@ export default function Contact() {
   }, []);
 
   const dayNight = theme === "light" ? "light" : "dark";
-  const bgSrc = `/contact/bg-${dayNight}.webp`;
+  const bgSrc = `/contact/bg-marble-gold-${dayNight}.webp`;
   const phoneSrc = `/contact/phone-${dayNight}.webp`;
 
   return (

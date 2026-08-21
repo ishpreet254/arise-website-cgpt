@@ -3888,7 +3888,7 @@ a.contact__detail-row:focus-visible {
   font-weight: 650;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--text-secondary);
+  color: var(--contact-details-label);
 }
 
 .contact__detail-value {
@@ -3913,8 +3913,8 @@ a.contact__detail-row:focus-visible {
   height: 2.75rem;
   border-radius: 50%;
   border: 1px solid var(--glass-border);
-  background: color-mix(in srgb, var(--glass-tint) 72%, transparent);
-  color: var(--text-secondary);
+  background: color-mix(in srgb, var(--glass-tint) 80%, transparent);
+  color: var(--social-buttons);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   transition:
