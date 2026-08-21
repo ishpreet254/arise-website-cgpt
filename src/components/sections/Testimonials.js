@@ -81,6 +81,7 @@ export default function Testimonials() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [inView, setInView] = useState(false);
+  const [openIndex, setOpenIndex] = useState(null);
 
   const isMountedRef = useRef(true);
   const hasEnteredRef = useRef(false); // guards the one-time auto fly-in
@@ -244,15 +245,38 @@ export default function Testimonials() {
     goToNext();
   }, [goToNext, reducedMotion]);
 
-  // ---- keyboard: right arrow advances, only while section is in view ----
+  // ---- open the full-text popup for the currently-active newspaper,
+  // same reveal pattern as the FAQ cloud lightbox ----
+  const handleCardClick = useCallback(
+    (index) => {
+      if (index !== activeIndex || isAnimating) return;
+      setOpenIndex(index);
+    },
+    [activeIndex, isAnimating],
+  );
+
+  const closeLightbox = useCallback(() => setOpenIndex(null), []);
+
+  // ---- keyboard: right arrow advances, only while section is in view and
+  // no popup is open ----
   useEffect(() => {
-    if (!inView || reducedMotion) return undefined;
+    if (!inView || reducedMotion || openIndex !== null) return undefined;
     const onKeyDown = (event) => {
       if (event.key === "ArrowRight") goToNext();
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [inView, reducedMotion, goToNext]);
+  }, [inView, reducedMotion, goToNext, openIndex]);
+
+  // ---- Escape closes the open testimonial popup ----
+  useEffect(() => {
+    if (openIndex === null) return undefined;
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") setOpenIndex(null);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [openIndex]);
 
   const dayNight = theme === "light" ? "day" : "night";
   const bgSrc = `/testimonials/testimonials-bg-${dayNight}.webp`;
@@ -267,17 +291,50 @@ export default function Testimonials() {
           <h2 className="testimonials__heading">What clients are saying</h2>
         </div>
         <div className="testimonials__static-list">
-          {TESTIMONIALS.map((item) => (
-            <figure key={item.slug} className="testimonials__static-item">
+          {TESTIMONIALS.map((item, i) => (
+            <button
+              key={item.slug}
+              type="button"
+              className="testimonials__static-item"
+              onClick={() => setOpenIndex(i)}
+              aria-haspopup="dialog"
+              aria-expanded={openIndex === i}
+              aria-label={`Read full testimonial: ${item.headline}`}
+            >
               <img
                 src={`/testimonials/testimonials-${item.slug}-day.webp`}
                 alt={`${item.headline} — “${item.quote}” — ${item.byline}`}
                 className="testimonials__static-image"
                 loading="lazy"
               />
-            </figure>
+            </button>
           ))}
         </div>
+
+        {openIndex !== null && (
+          <div
+            className="testimonials__lightbox"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="testimonials-lightbox-headline"
+          >
+            <div className="testimonials__lightbox-backdrop" onClick={closeLightbox} aria-hidden="true" />
+            <div className="testimonials__lightbox-panel">
+              <button
+                type="button"
+                className="testimonials__lightbox-close"
+                onClick={closeLightbox}
+                aria-label="Close testimonial"
+              >
+                ×
+              </button>
+              <p className="testimonials__lightbox-eyebrow">Client Feedback</p>
+              <h3 id="testimonials-lightbox-headline">{TESTIMONIALS[openIndex].headline}</h3>
+              <p className="testimonials__lightbox-quote">&ldquo;{TESTIMONIALS[openIndex].quote}&rdquo;</p>
+              <p className="testimonials__lightbox-byline">— {TESTIMONIALS[openIndex].byline}</p>
+            </div>
+          </div>
+        )}
       </section>
     );
   }
@@ -293,8 +350,9 @@ export default function Testimonials() {
       <div className="testimonials__stage">
         <div className="testimonials__cards">
           {TESTIMONIALS.map((item, i) => (
-            <div
+            <button
               key={item.slug}
+              type="button"
               ref={(el) => {
                 cardRefs.current[i] = el;
               }}
@@ -304,11 +362,16 @@ export default function Testimonials() {
                 zIndex: i === activeIndex ? 2 : 1,
               }}
               aria-hidden={i !== activeIndex}
+              tabIndex={i === activeIndex ? 0 : -1}
+              onClick={() => handleCardClick(i)}
+              aria-haspopup="dialog"
+              aria-expanded={openIndex === i}
+              aria-label={`Read full testimonial: ${item.headline}`}
             >
               <span className="testimonials__sr-only">
                 {item.headline} — &ldquo;{item.quote}&rdquo; — {item.byline}
               </span>
-            </div>
+            </button>
           ))}
         </div>
       </div>
@@ -343,6 +406,31 @@ export default function Testimonials() {
       <p className="testimonials__sr-only" aria-live="polite">
         Showing testimonial {activeIndex + 1} of {TESTIMONIALS.length}: {activeItem.headline}
       </p>
+
+      {openIndex !== null && (
+        <div
+          className="testimonials__lightbox"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="testimonials-lightbox-headline"
+        >
+          <div className="testimonials__lightbox-backdrop" onClick={closeLightbox} aria-hidden="true" />
+          <div className="testimonials__lightbox-panel">
+            <button
+              type="button"
+              className="testimonials__lightbox-close"
+              onClick={closeLightbox}
+              aria-label="Close testimonial"
+            >
+              ×
+            </button>
+            <p className="testimonials__lightbox-eyebrow">Client Feedback</p>
+            <h3 id="testimonials-lightbox-headline">{TESTIMONIALS[openIndex].headline}</h3>
+            <p className="testimonials__lightbox-quote">&ldquo;{TESTIMONIALS[openIndex].quote}&rdquo;</p>
+            <p className="testimonials__lightbox-byline">— {TESTIMONIALS[openIndex].byline}</p>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

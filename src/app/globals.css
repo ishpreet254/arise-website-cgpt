@@ -2269,6 +2269,19 @@ html[data-custom-cursor="on"] .theme-switch button {
   background-repeat: no-repeat;
   filter: drop-shadow(0 28px 55px rgba(0, 0, 0, 0.4));
   will-change: transform, opacity;
+  /* Reset <button> defaults — this is a full-bleed image trigger, and the
+     newspaper art has transparent corners the backdrop must show through */
+  padding: 0;
+  border: none;
+  appearance: none;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.testimonials__card:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 6px;
+  border-radius: var(--radius-card);
 }
 
 .testimonials__sr-only {
@@ -2377,6 +2390,115 @@ html[data-custom-cursor="on"] .theme-switch button {
   transform: translateX(3px);
 }
 
+/* ---- Full-text reveal popup, same reveal pattern as the FAQ lightbox ---- */
+.testimonials__lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1.5rem, 5vw, 3rem);
+}
+
+.testimonials__lightbox-backdrop {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(20px) saturate(120%);
+  -webkit-backdrop-filter: blur(20px) saturate(120%);
+}
+
+.testimonials__lightbox-panel {
+  position: relative;
+  width: min(38rem, 92vw);
+  max-height: 82vh;
+  overflow: auto;
+  padding: clamp(2rem, 5vw, 3.5rem);
+  border-radius: var(--radius-card);
+  border: 1px solid var(--glass-border);
+  background: color-mix(in srgb, var(--glass-tint) 92%, transparent);
+  box-shadow: var(--glass-inner-highlight), var(--shadow-soft);
+  animation: testimonials-lightbox-in 0.4s var(--ease-spring);
+}
+
+@keyframes testimonials-lightbox-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.testimonials__lightbox-eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--text-caption);
+  font-weight: 650;
+  letter-spacing: var(--tracking-caption);
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0 0 0.75rem;
+}
+
+.testimonials__lightbox-panel h3 {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.4vw, 2rem);
+  color: var(--text-primary);
+  line-height: 1.25;
+  margin: 0 0 1.25rem;
+}
+
+.testimonials__lightbox-quote {
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 1.3vw, 1.15rem);
+  line-height: 1.65;
+  color: var(--text-secondary);
+  margin: 0 0 1rem;
+}
+
+.testimonials__lightbox-byline {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 650;
+  color: var(--text-primary);
+  opacity: 0.85;
+  margin: 0;
+}
+
+.testimonials__lightbox-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+.testimonials__lightbox-close:hover {
+  background: var(--glass-border);
+  color: var(--text-primary);
+}
+
+@media (max-width: 700px) {
+  .testimonials__lightbox-panel {
+    width: min(30rem, 94vw);
+    max-height: 86vh;
+  }
+}
+
 /* ---- Reduced motion: static stacked list, no fly-in/roll timeline ---- */
 .testimonials--static {
   background: var(--bg);
@@ -2413,9 +2535,26 @@ html[data-custom-cursor="on"] .theme-switch button {
 
 .testimonials__static-item {
   margin: 0;
+  padding: 0;
+  border: none;
   border-radius: var(--radius-card);
   overflow: hidden;
   box-shadow: var(--shadow-soft);
+  cursor: pointer;
+  appearance: none;
+  background: none;
+  text-align: left;
+  transition: transform 0.3s var(--ease-spring), box-shadow 0.3s ease;
+}
+
+.testimonials__static-item:hover,
+.testimonials__static-item:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-soft), 0 0 0 2px var(--gold);
+}
+
+.testimonials__static-item:focus-visible {
+  outline: none;
 }
 
 .testimonials__static-image {
