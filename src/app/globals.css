@@ -2961,6 +2961,457 @@ html[data-custom-cursor="on"] .theme-switch button {
   }
 }
 
+/* ---------- Reach Out ---------- */
+/* Master Spec §5.7 — postcard-styled enquiry form. The postbox sits docked
+   in the corner the whole time (idle float only); the stamp and envelope
+   are invisible until ReachOut.js's GSAP flight plays on a confirmed
+   Formspree success — see that file for the full sequencing rationale.
+   The postcard has no fixed aspect-ratio: background-size 100% 100% lets
+   it stretch to whatever height the form content needs (e.g. once the
+   optional details group opens) without clipping.
+
+   Because background-size is 100% 100% (stretch-to-fill, not
+   contain/cover), the padding below only lines up with the printed
+   gold border in the art if every postcard/envelope asset reserves
+   the same relative margin around its "safe" interior. reachout-
+   postcard-day.webp and reachout-envelope-day.webp were re-cropped
+   for this reason — the light-theme source files originally carried
+   a much larger transparent margin than their dark-theme
+   counterparts, which pushed the printed card inward and left the
+   form fields sitting outside it. If new day/night art ever
+   replaces these files, re-match the margins (or this padding will
+   drift out of alignment again in exactly one theme). */
+
+.reach-out {
+  position: relative;
+  background: var(--bg);
+  padding: var(--section-padding-y) 0;
+  overflow: hidden;
+}
+
+.reach-out--paused .reach-out__postbox {
+  animation-play-state: paused;
+}
+
+.reach-out__backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.reach-out__inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 2.5rem;
+}
+
+.reach-out__intro {
+  max-width: 34rem;
+  margin: 0 auto clamp(3rem, 6vw, 5rem);
+  text-align: center;
+}
+
+.reach-out__eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--text-caption);
+  font-weight: 650;
+  letter-spacing: var(--tracking-caption);
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0 0 0.75rem;
+}
+
+.reach-out__heading {
+  font-family: var(--font-display);
+  font-size: var(--text-display-l);
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.1;
+}
+
+.reach-out__subhead {
+  font-family: var(--font-body);
+  font-size: var(--text-body-l);
+  color: var(--text-secondary);
+  margin: 1rem 0 0;
+  line-height: 1.6;
+}
+
+.reach-out__stage {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  padding-top: clamp(2rem, 5vw, 3.5rem);
+}
+
+.reach-out__postbox-wrap {
+  position: absolute;
+  right: 2%;
+  bottom: -1rem;
+  z-index: 1;
+  width: clamp(9rem, 15vw, 14rem);
+  pointer-events: none;
+}
+
+.reach-out__postbox {
+  display: block;
+  width: 100%;
+  height: auto;
+  transform-origin: bottom center;
+  filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.35));
+  animation: reach-out-postbox-float 6s ease-in-out infinite;
+}
+
+@keyframes reach-out-postbox-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3%);
+  }
+}
+
+.reach-out__card-wrap {
+  position: relative;
+  z-index: 2;
+  width: min(46rem, 92vw);
+}
+
+.reach-out__postcard {
+  position: relative;
+  width: 100%;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  border-radius: 0.9rem;
+  box-shadow: var(--shadow-soft);
+  padding: clamp(2rem, 4.5vw, 3rem) clamp(2rem, 4.5vw, 3.25rem) clamp(1.85rem, 3.5vw, 2.5rem);
+  transition: opacity 0.4s ease;
+}
+
+.reach-out__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+}
+
+.reach-out__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.35rem;
+}
+
+.reach-out__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.reach-out__label {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.reach-out__field input,
+.reach-out__field textarea,
+.reach-out__select-wrap select {
+  width: 100%;
+  border: none;
+  border-bottom: 1.5px solid var(--hairline);
+  background: transparent;
+  padding: 0.45rem 0.1rem;
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  color: var(--text-primary);
+  transition: border-color 0.3s var(--ease-spring);
+}
+
+.reach-out__field textarea {
+  resize: vertical;
+  min-height: 5.5rem;
+  line-height: 1.5;
+}
+
+.reach-out__field input:focus,
+.reach-out__field textarea:focus,
+.reach-out__select-wrap select:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+
+.reach-out__field input:disabled,
+.reach-out__field textarea:disabled,
+.reach-out__select-wrap select:disabled {
+  opacity: 0.55;
+}
+
+.reach-out__select-wrap {
+  position: relative;
+}
+
+.reach-out__select-wrap select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 1.4rem;
+  cursor: pointer;
+}
+
+.reach-out__select-wrap::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 0.15rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 1.5px solid var(--text-secondary);
+  border-bottom: 1.5px solid var(--text-secondary);
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+}
+
+.reach-out__error {
+  color: #d1453a;
+  font-size: 0.82rem;
+}
+
+.reach-out__error--submit {
+  align-self: center;
+}
+
+.reach-out__details-toggle {
+  align-self: flex-start;
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  border: none;
+  background: none;
+  padding: 0;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--gold);
+  cursor: pointer;
+}
+
+.reach-out__details-hint {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text-secondary);
+}
+
+.reach-out__details {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.5s var(--ease-spring);
+}
+
+.reach-out__details.is-open {
+  grid-template-rows: 1fr;
+}
+
+.reach-out__details-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.reach-out__details.is-open .reach-out__details-inner {
+  padding-top: 0.2rem;
+}
+
+.reach-out__submit-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.3rem;
+}
+
+.reach-out__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.95rem 2.15rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-button);
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    transform 0.45s var(--ease-spring),
+    background-color 0.45s var(--ease-spring),
+    border-color 0.45s var(--ease-spring),
+    opacity 0.3s ease;
+}
+
+.reach-out__button:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.reach-out__button:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.reach-out__button--primary {
+  background: var(--gold);
+  color: var(--bg);
+  box-shadow: 0 12px 35px color-mix(in srgb, var(--gold) 18%, transparent);
+}
+
+.reach-out__button--primary:hover:not(:disabled) {
+  background: var(--gold-champagne);
+}
+
+.reach-out__button--ghost {
+  border-color: var(--glass-border);
+  background: color-mix(in srgb, var(--glass-tint) 72%, transparent);
+  color: var(--text-primary);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.reach-out__button--ghost:hover {
+  border-color: var(--gold);
+}
+
+.reach-out__success {
+  display: flex;
+  min-height: 12rem;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.reach-out__success-eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--text-caption);
+  font-weight: 650;
+  letter-spacing: var(--tracking-caption);
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0;
+}
+
+.reach-out__success h3 {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.reach-out__success p {
+  font-family: var(--font-body);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.reach-out__success .reach-out__button {
+  margin-top: 0.75rem;
+}
+
+.reach-out__envelope {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: 0.9rem;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+/* The stamp lands where the envelope flap actually seals shut — that
+   point sits at a slightly different relative spot in the dark-theme
+   vs light-theme envelope artwork, so each theme gets its own
+   left/top (measured from the flap's V-tip in each asset), while
+   sharing the same centering technique: the box's own top-left corner
+   is nudged by half its size via margin, so the stamp's *center*
+   — not its corner — sits exactly on that point at every viewport. */
+.reach-out__stamp {
+  --stamp-size: clamp(4.5rem, 8vw, 7rem);
+  position: absolute;
+  left: 46.5%;
+  top: 64%;
+  margin: calc(var(--stamp-size) / -2) 0 0 calc(var(--stamp-size) / -2);
+  z-index: 4;
+  width: var(--stamp-size);
+  aspect-ratio: 1 / 1;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+[data-theme="light"] .reach-out__stamp {
+  left: 46%;
+  top: 66%;
+}
+
+@media (max-width: 700px) {
+  .reach-out__row {
+    grid-template-columns: 1fr;
+    gap: 1.1rem;
+  }
+
+  /* The postbox docks in the corner on desktop, but there isn't a
+     spare corner at phone widths — overlapping it there crowded the
+     submit button against the postbox. Stacking it below the card
+     keeps both fully legible and still gives the GSAP flight a real
+     element to fly the envelope into (its position is measured live
+     via getBoundingClientRect, so this reflow doesn't need any JS
+     changes). */
+  .reach-out__stage {
+    flex-direction: column;
+    min-height: unset;
+    gap: 1.75rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .reach-out__postbox-wrap {
+    position: static;
+    order: 2;
+    width: clamp(6rem, 26vw, 8rem);
+  }
+
+  .reach-out__card-wrap {
+    order: 1;
+    width: 100%;
+  }
+
+  .reach-out__postcard {
+    padding: 1.85rem 1.6rem 1.6rem;
+  }
+
+  .reach-out__form {
+    gap: 1.2rem;
+  }
+
+  .reach-out__stamp {
+    --stamp-size: clamp(3.5rem, 15vw, 5rem);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero__button {
     transition: none;
@@ -2977,6 +3428,18 @@ html[data-custom-cursor="on"] .theme-switch button {
   .testimonials__tick,
   .testimonials__next-button,
   .testimonials__next-arrow {
+    transition: none;
+  }
+
+  .reach-out__postbox {
+    animation: none;
+  }
+
+  .reach-out__button,
+  .reach-out__field input,
+  .reach-out__field textarea,
+  .reach-out__select-wrap select,
+  .reach-out__postcard {
     transition: none;
   }
 }
