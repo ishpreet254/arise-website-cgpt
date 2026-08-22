@@ -142,7 +142,7 @@ export default function About() {
       <section id="about" className="about about--static" data-section="About">
         <div className="about__intro">
           <p className="about__eyebrow">Why ARISE</p>
-          <h2 className="about__heading">We don’t just build websites. We build perception</h2>
+          <h2 className="about__heading">Built different, on purpose.</h2>
           <p className="about__lede">
             Seven reasons brands choose to build with us — no filler, just how we work.
           </p>
@@ -164,7 +164,7 @@ export default function About() {
     <section ref={rootRef} id="about" className="about" data-section="About">
       <div className="about__intro">
         <p className="about__eyebrow">Why ARISE</p>
-        <h2 className="about__heading">We don’t just build websites. We build perception</h2>
+        <h2 className="about__heading">Built different, on purpose.</h2>
         <p className="about__lede">
           Seven reasons brands choose to build with us — no filler, just how we work.
         </p>

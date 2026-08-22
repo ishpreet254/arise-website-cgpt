@@ -3582,3 +3582,392 @@ html[data-custom-cursor="on"] .theme-switch button {
     transition: none;
   }
 }
+/* ============================================================
+   Contact — Master Spec §5.8
+   ============================================================ */
+
+.contact {
+  position: relative;
+  background: var(--bg);
+  padding: var(--section-padding-y) 0;
+  overflow: hidden;
+}
+
+.contact__backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Same quiet film-grain technique as .hero__grain — ties the staged
+   product photography to the site's photographic language instead of
+   sitting on a flat, over-clean gradient. */
+.contact__grain {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.05;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.65'/%3E%3C/svg%3E");
+  mix-blend-mode: soft-light;
+}
+
+.contact__inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 2.5rem;
+}
+
+.contact__intro {
+  max-width: 34rem;
+  margin: 0 auto clamp(3rem, 6vw, 5rem);
+  text-align: center;
+}
+
+.contact__eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--text-caption);
+  font-weight: 650;
+  letter-spacing: var(--tracking-caption);
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0 0 0.75rem;
+}
+
+.contact__heading {
+  font-family: var(--font-display);
+  font-size: var(--text-display-l);
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.15;
+}
+
+.contact__grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  align-items: center;
+  gap: clamp(2.5rem, 6vw, 5rem);
+}
+
+/* ---- phone stage ---- */
+
+.contact__stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.75rem;
+}
+
+.contact__glow {
+  position: absolute;
+  top: 46%;
+  left: 50%;
+  width: min(30rem, 88%);
+  aspect-ratio: 1 / 1;
+  transform: translate(-50%, -50%);
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--gold-champagne) 38%, transparent) 0%, transparent 42%),
+    radial-gradient(circle, color-mix(in srgb, var(--gold) 26%, transparent) 0%, transparent 70%);
+  filter: blur(14px);
+  pointer-events: none;
+  z-index: 0;
+  animation: contact-glow-breathe 6.5s var(--ease-spring) infinite;
+}
+
+@keyframes contact-glow-breathe {
+  0%, 100% { opacity: 0.75; transform: translate(-50%, -50%) scale(0.97); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.04); }
+}
+
+.contact__phone-button {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  max-width: 25rem;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  animation: contact-phone-float 7s ease-in-out infinite;
+}
+
+/* Concentric call-affordance rings — quiet on their own, they bloom out
+   on hover/focus like a phone announcing an incoming call. Reinforces
+   "tap to call" without needing a label. */
+.contact__phone-button::before,
+.contact__phone-button::after {
+  content: "";
+  position: absolute;
+  top: 58%;
+  left: 50%;
+  width: 55%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--gold) 55%, transparent);
+  transform: translate(-50%, -50%) scale(0.85);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.contact__phone-button:hover::before,
+.contact__phone-button:focus-visible::before {
+  animation: contact-ring-pulse 1.6s var(--ease-spring) infinite;
+}
+
+.contact__phone-button:hover::after,
+.contact__phone-button:focus-visible::after {
+  animation: contact-ring-pulse 1.6s var(--ease-spring) 0.45s infinite;
+}
+
+@keyframes contact-ring-pulse {
+  0% { opacity: 0.55; transform: translate(-50%, -50%) scale(0.8); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.35); }
+}
+
+.contact__phone-image {
+  display: block;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1434 / 1166;
+  object-fit: contain;
+  filter: drop-shadow(0 25px 40px rgba(0, 0, 0, 0.4));
+  transition:
+    transform 0.5s var(--ease-spring),
+    filter 0.5s var(--ease-spring);
+}
+
+@keyframes contact-phone-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3%); }
+}
+
+.contact__phone-button:hover .contact__phone-image,
+.contact__phone-button:focus-visible .contact__phone-image {
+  transform: scale(1.035);
+  filter: drop-shadow(0 30px 46px rgba(0, 0, 0, 0.45)) brightness(1.06);
+}
+
+.contact__phone-button:active .contact__phone-image {
+  transform: scale(1.01);
+}
+
+.contact__call-button {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.95rem 2.35rem;
+  border-radius: var(--radius-button);
+  background: var(--gold);
+  color: var(--bg);
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  overflow: hidden;
+  box-shadow: 0 12px 35px color-mix(in srgb, var(--gold) 18%, transparent);
+  transition:
+    transform 0.45s var(--ease-spring),
+    background-color 0.45s var(--ease-spring),
+    box-shadow 0.45s var(--ease-spring);
+}
+
+.contact__call-icon {
+  width: 0.95rem;
+  height: 0.95rem;
+  flex-shrink: 0;
+}
+
+.contact__call-button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.55) 48%, transparent 66%);
+  transform: translateX(-120%);
+}
+
+.contact__call-button:hover::before,
+.contact__call-button:focus-visible::before {
+  transform: translateX(120%);
+  transition: transform 0.75s var(--ease-spring);
+}
+
+.contact__call-button:hover,
+.contact__call-button:focus-visible {
+  background: var(--gold-champagne);
+  transform: translateY(-2px);
+  box-shadow: 0 16px 42px color-mix(in srgb, var(--gold) 28%, transparent);
+}
+
+/* ---- details ---- */
+
+.contact__details {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.contact__detail-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.35rem 0;
+  border-bottom: 1px solid var(--hairline);
+  text-decoration: none;
+  transition:
+    padding-left 0.35s var(--ease-spring),
+    border-color 0.35s ease;
+}
+
+.contact__detail-row:first-child {
+  padding-top: 0;
+}
+
+a.contact__detail-row:hover,
+a.contact__detail-row:focus-visible {
+  padding-left: 0.5rem;
+  border-color: color-mix(in srgb, var(--gold) 40%, transparent);
+}
+
+.contact__detail-row--static {
+  cursor: default;
+}
+
+.contact__detail-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  border: 1px solid var(--glass-border);
+  background: color-mix(in srgb, var(--glass-tint) 72%, transparent);
+  color: var(--gold);
+  transition:
+    border-color 0.35s ease,
+    transform 0.35s var(--ease-spring);
+}
+
+.contact__detail-row:hover .contact__detail-icon-wrap,
+.contact__detail-row:focus-visible .contact__detail-icon-wrap {
+  border-color: var(--gold);
+  transform: scale(1.06);
+}
+
+.contact__detail-icon {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.contact__detail-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.contact__detail-label {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.contact__detail-value {
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 1.8vw, 1.4rem);
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.contact__socials {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-top: 1.75rem;
+}
+
+.contact__social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  border: 1px solid var(--glass-border);
+  background: color-mix(in srgb, var(--glass-tint) 72%, transparent);
+  color: var(--text-secondary);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition:
+    transform 0.4s var(--ease-spring),
+    color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.contact__social-link:hover,
+.contact__social-link:focus-visible {
+  color: var(--gold);
+  border-color: var(--gold);
+  transform: translateY(-2px);
+}
+
+.contact__social-icon {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+@media (max-width: 900px) {
+  .contact__grid {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+}
+
+@media (max-width: 700px) {
+  .contact__stage {
+    gap: 1.5rem;
+  }
+
+  .contact__phone-button {
+    max-width: 18rem;
+  }
+
+  .contact__detail-row {
+    padding: 1.1rem 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact__phone-image,
+  .contact__call-button,
+  .contact__detail-row,
+  .contact__social-link {
+    transition: none;
+  }
+
+  .contact__phone-button,
+  .contact__glow,
+  .contact__phone-button::before,
+  .contact__phone-button::after {
+    animation: none;
+  }
+}

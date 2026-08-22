@@ -250,7 +250,7 @@ export default function ReachOut() {
       <div className="reach-out__inner">
         <div className="reach-out__intro">
           <p className="reach-out__eyebrow">Get In Touch</p>
-          <h2 className="reach-out__heading">Let’s make something impossible to ignore.</h2>
+          <h2 className="reach-out__heading">Tell us about your project</h2>
           <p className="reach-out__subhead">
             Send us a few details and we&rsquo;ll get back to you with next steps.
           </p>
